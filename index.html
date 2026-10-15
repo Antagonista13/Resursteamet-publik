@@ -98,6 +98,33 @@
  body.display-view .workload-row .pending-list,body.display-view .workload-row .placement-list{max-height:92px}
 }
 @media(max-width:999px){.workload-row{grid-template-columns:1fr}}
+
+/* TV med hög belastning: kompakta kort, automatisk sidväxling utan intern scroll. */
+@media(min-width:1000px){
+ body.display-view header{min-height:47px}
+ body.display-view .top-overview>.card{min-height:0;padding:7px 11px}
+ body.display-view .top-overview{margin-top:5px}
+ body.display-view .top-overview h2{font-size:12px}
+ body.display-view .top-overview .temp{font-size:32px}
+ body.display-view .top-overview #weather-icon{font-size:33px}
+ body.display-view .top-overview .meal-content{font-size:15px!important;line-height:1.16!important}
+ body.display-view .top-overview .break-count{font-size:15px}
+ body.display-view .calendar-layout{margin-top:7px;min-height:200px}
+ body.display-view .calendar-layout>.card{padding:8px 10px}
+ body.display-view .calendar-layout h2{font-size:13px;margin-bottom:4px}
+ body.display-view .activity{padding:6px 8px;margin-bottom:5px;line-height:1.2}
+ body.display-view .activity .muted{font-size:11px}
+ body.display-view .day-initials{margin:4px 0 6px;padding:5px;font-size:12px}
+ body.display-view .week-event{padding:4px;margin-bottom:4px;line-height:1.2}
+ body.display-view .workload-row{height:155px;margin-top:7px}
+ body.display-view .workload-row>.card{padding:7px 10px}
+ body.display-view .workload-row .pending-list,body.display-view .workload-row .placement-list{max-height:none;overflow:hidden;margin-top:5px}
+ body.display-view .workload-row .pending-item,body.display-view .workload-row .placement-item{padding:5px 7px}
+ body.display-view .placement-progress{margin:4px 0 2px}
+ body.display-view .small-note{display:none}
+ body.display-view [data-tv-hidden="true"]{display:none!important}
+}
+.tv-pager{font-size:11px;color:#b9c8d3;white-space:nowrap;margin-left:8px}
 </style></head><body class="display-view"><main>
 <header><div><h1>RESURSTEAMET</h1><div class="muted">Arbetsrummets informationstavla</div></div><div class="mode-controls"><button type="button" id="display-mode" aria-pressed="true">Storbildsläge</button><button type="button" id="edit-mode" aria-pressed="false">Redigeringsläge</button></div><div><div class="clock" id="clock">--:--</div><div id="date" class="muted"></div></div></header>
 <div class="grid summary-grid top-overview"><section class="card"><h2>DAGENS VÄDER · BORÅS</h2><div class="weather-primary"><span id="weather-icon" role="img" aria-label="Väder">🌤️</span><div class="temp" id="temp">--°</div></div><div id="weather" class="muted">Hämtar aktuellt väder …</div></section><section class="card lunch-card"><h2>DAGENS MATSEDEL · GÅNGHESTERSKOLAN</h2><div id="meal-date" class="muted"></div><div id="meal-content" class="meal-content">Hämtar matsedeln …</div><a class="link" href="https://menu.matildaplatform.com/meals/week/68d18b0e30b565aba61bf59e_boras-ganghesterskolan-kok" target="_blank" rel="noopener noreferrer">Veckans matsedel</a></section><section class="card"><h2>NÄSTA LOV</h2><div style="font-size:23px;font-weight:750" id="break">Höstlov</div><div class="muted" id="breakdate">26–30 oktober 2026 (preliminärt)</div><div id="break-count" class="break-count"></div><p class="muted">Kontrollera läsårstider mot Borås Stads officiella uppgifter.</p></section></div>
@@ -256,4 +283,31 @@ document.getElementById('placement-form').addEventListener('submit',e=>{
  document.getElementById('placement-feedback').textContent='Testplacering tillagd (försvinner vid omladdning).';renderPlacements();
 });
 renderPlacements();setInterval(renderPlacements,60*60*1000);
+
+let tvPage=0;
+function updateTvPages(){
+ const isTV=document.body.classList.contains('display-view');
+ const groups=[
+  {items:[...document.querySelectorAll('#today-events .activity')],per:4,id:'today-label'},
+  {items:[...document.querySelectorAll('#pending-list .pending-item')],per:4,id:'pending-count'},
+  {items:[...document.querySelectorAll('#placement-list .placement-item')],per:4,id:'placement-count'}
+ ];
+ const infoIds=['today-label','pending-count','placement-count'];
+ groups.forEach((group,i)=>{
+  const pages=Math.max(1,Math.ceil(group.items.length/group.per));
+  group.items.forEach((el,index)=>{el.dataset.tvHidden=String(isTV && Math.floor(index/group.per)!==(tvPage%pages));});
+  let label=document.getElementById('tv-page-'+i);
+  if(!label){label=document.createElement('span');label.id='tv-page-'+i;label.className='tv-pager';document.getElementById(infoIds[i]).after(label);}
+  label.textContent=isTV&&pages>1?'Visar '+(tvPage%pages+1)+'/'+pages+' · '+group.items.length+' totalt':'';
+ });
+ document.querySelectorAll('#week-grid .day').forEach((day,i)=>{
+  const items=[...day.querySelectorAll('.week-event')],per=4,pages=Math.max(1,Math.ceil(items.length/per));
+  items.forEach((el,index)=>{el.dataset.tvHidden=String(isTV&&Math.floor(index/per)!==(tvPage%pages));});
+  let label=day.querySelector('.tv-pager');
+  if(!label){label=document.createElement('div');label.className='tv-pager';day.append(label);}
+  label.textContent=isTV&&pages>1?'Aktiviteter '+(tvPage%pages+1)+'/'+pages:'';
+ });
+}
+setInterval(()=>{tvPage++;updateTvPages();},12000);
+setInterval(updateTvPages,1500);
 </script></body></html>
