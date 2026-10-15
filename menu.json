@@ -1,0 +1,84 @@
+{
+  "updatedAt": "2026-10-15T16:20:26.862096+02:00",
+  "source": "https://menu.matildaplatform.com/api/menu?distributorId=68d18b0e30b565aba61bf59e&startDate=2026-10-12&endDate=2026-10-25&lang=sv",
+  "meals": [
+    {
+      "date": "2026-10-12T00:00:00",
+      "name": "",
+      "dishes": [
+        "Stekt kyckling med rosépepparsås & Vaxholmsris",
+        "Caponata di melanzane & pasta"
+      ]
+    },
+    {
+      "date": "2026-10-13T00:00:00",
+      "name": "",
+      "dishes": [
+        "Ångad fisk med ägg & persiljesås serveras med kokt potatis",
+        "Morotsbiffar med böncréme & rostade rotfrukter"
+      ]
+    },
+    {
+      "date": "2026-10-14T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kålpudding med gräddsås & kokt potatis",
+        "Färssås & Spaghetti"
+      ]
+    },
+    {
+      "date": "2026-10-15T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kockens val"
+      ]
+    },
+    {
+      "date": "2026-10-16T00:00:00",
+      "name": "",
+      "dishes": [
+        "Cowboysoppa med bröd & tillbehör",
+        "Champinjonsoppa med vitlök & brödkrutonger med bröd & tillbehör"
+      ]
+    },
+    {
+      "date": "2026-10-19T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kebabgryta med bulgur",
+        "Rårakor med grönkål, bönsalsa & keso"
+      ]
+    },
+    {
+      "date": "2026-10-20T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kycklingbiffar med gråärt, potatismos & pressgurka",
+        "Pankopanerade rödbetsbiffar med matvete & fetaostcréme"
+      ]
+    },
+    {
+      "date": "2026-10-21T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kockens val"
+      ]
+    },
+    {
+      "date": "2026-10-22T00:00:00",
+      "name": "",
+      "dishes": [
+        "Kycklingbiffar med gråärt, potatismos & pressgurka",
+        "Krämig pasta med grillost"
+      ]
+    },
+    {
+      "date": "2026-10-23T00:00:00",
+      "name": "",
+      "dishes": [
+        "Broccolisoppa med bröd & tillbehör",
+        "Pumpasoppa med färskost & rostade pumpakärnor med bröd & tillbehör"
+      ]
+    }
+  ]
+}
