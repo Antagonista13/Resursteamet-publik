@@ -131,19 +131,27 @@ const viewKey='resursteamet_view_mode_v1';
 function setMode(mode){const edit=mode==='edit';document.body.classList.toggle('display-view',!edit);document.body.classList.toggle('edit-view',edit);document.getElementById('display-mode').setAttribute('aria-pressed',String(!edit));document.getElementById('edit-mode').setAttribute('aria-pressed',String(edit));try{localStorage.setItem(viewKey,edit?'edit':'display');}catch(e){}}
 document.getElementById('display-mode').addEventListener('click',()=>setMode('display'));document.getElementById('edit-mode').addEventListener('click',()=>setMode('edit'));
 try{setMode(localStorage.getItem(viewKey)==='edit'?'edit':'display');}catch(e){setMode('display');}
+let latestMenuData={meals:[]};
 function renderMeal(data){
- const now=new Date(),key=dateKey(now),weekday=now.getDay(),meal=document.getElementById('meal-content');
- document.getElementById('meal-date').textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
- if(weekday===0||weekday===6){meal.textContent='Ingen skollunch på helgen.';return;}
+ const now=new Date(), target=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ if(now.getHours()>=13 || target.getDay()===0 || target.getDay()===6)target.setDate(target.getDate()+1);
+ while(target.getDay()===0 || target.getDay()===6)target.setDate(target.getDate()+1);
+ const isToday=dateKey(target)===dateKey(now);
+ document.querySelector('.lunch-card h2').textContent=(isToday?'DAGENS MATSEDEL':'NÄSTA SKOLDAGS MATSEDEL')+' · GÅNGHESTERSKOLAN';
+ document.getElementById('meal-date').textContent=target.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+ const meal=document.getElementById('meal-content');
  const meals=Array.isArray(data?.meals)?data.meals:[];
- const found=meals.find(m=>typeof m?.date==='string'&&m.date.slice(0,10)===key);
+ const found=meals.find(m=>typeof m?.date==='string' && m.date.slice(0,10)===dateKey(target));
  meal.replaceChildren();
- if(!found||!Array.isArray(found.dishes)||!found.dishes.length){meal.textContent='Ingen aktuell matsedel tillgänglig. Öppna veckans matsedel via länken nedan.';return;}
+ if(!found||!Array.isArray(found.dishes)||!found.dishes.length){
+   meal.textContent='Ingen meny publicerad för '+target.toLocaleDateString('sv-SE',{weekday:'long'})+'. Se veckans matsedel.';
+   return;
+ }
  found.dishes.forEach(d=>{const row=document.createElement('div');row.textContent=String(d);meal.append(row);});
 }
 async function loadMeal(){
- try{const r=await fetch('menu.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Saknas');const j=await r.json();renderMeal(j);}
- catch(e){renderMeal({meals:[]});}
+ try{const r=await fetch('menu.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Saknas');const j=await r.json();latestMenuData=j;renderMeal(j);}
+ catch(e){renderMeal(latestMenuData);}
 }
-loadMeal();setInterval(loadMeal,15*60*1000);
+loadMeal();setInterval(loadMeal,15*60*1000);setInterval(()=>renderMeal(latestMenuData),60*1000);
 </script></body></html>
