@@ -172,12 +172,12 @@ function renderPending(){
  document.getElementById('pending-count').textContent=pendingDemo.length+' väntande';
  const list=document.getElementById('pending-list');list.replaceChildren();
  if(!pendingDemo.length){const p=document.createElement('p');p.className='muted';p.textContent='Inga testuppdrag';list.append(p);return;}
- for(const p of pendingDemo){
+ for(const [index,p] of pendingDemo.entries()){
   const item=document.createElement('div');item.className='pending-item';
   const school=document.createElement('strong');school.textContent=p.school;
   const date=document.createElement('div');date.className='muted';date.textContent='Start: '+(p.start?p.start:'Ej fastställd');
   const status=document.createElement('div');status.className='muted';status.textContent=p.status;
-  item.append(school,date,status);list.append(item);
+  const controls=document.createElement('div');controls.className='editor-action';controls.style.marginTop='7px';const reject=document.createElement('button');reject.type='button';reject.className='tiny';reject.textContent='Avslå / ta bort';reject.addEventListener('click',()=>{if(!confirm('Ta bort testuppdraget från '+p.school+' ur väntelistan?'))return;pendingDemo.splice(index,1);document.getElementById('pending-feedback').textContent='Uppdraget togs bort från väntelistan.';renderPending();});controls.append(reject);item.append(school,date,status,controls);list.append(item);
  }
 }
 document.getElementById('pending-form').addEventListener('submit',e=>{
