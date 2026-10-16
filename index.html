@@ -176,6 +176,11 @@
  body.display-view .workload-row .pending-list,
  body.display-view .workload-row .placement-list{max-height:none!important;overflow:hidden}
 }
+
+/* Finjustering: lyft båda nedre informationsrutorna sex pixlar. */
+@media(min-width:1000px){
+ body.display-view .workload-row{transform:translateY(-6px)}
+}
 </style></head><body class="display-view"><main>
 <header><div><h1>RESURSTEAMET</h1><div class="muted">Arbetsrummets informationstavla</div></div><div class="mode-controls"><button type="button" id="display-mode" aria-pressed="true">Storbildsläge</button><button type="button" id="edit-mode" aria-pressed="false">Redigeringsläge</button></div><div><div class="clock" id="clock">--:--</div><div id="date" class="muted"></div></div></header>
 <div class="grid summary-grid top-overview"><section class="card"><h2>DAGENS VÄDER · BORÅS</h2><div class="weather-primary"><span id="weather-icon" role="img" aria-label="Väder">🌤️</span><div class="temp" id="temp">--°</div></div><div id="weather" class="muted">Hämtar aktuellt väder …</div></section><section class="card rotation-indicator" aria-label="Automatisk växling"><div class="hourglass" aria-hidden="true">⌛</div><div class="rotation-copy"><strong>AUTOMATISK VÄXLING</strong><div id="rotation-message">Kontrollerar vyer …</div><div class="rotation-track"><span id="rotation-progress"></span></div></div></section><section class="card lunch-card"><h2>DAGENS MATSEDEL · GÅNGHESTERSKOLAN</h2><div id="meal-date" class="muted"></div><div id="meal-content" class="meal-content">Hämtar matsedeln …</div><a class="link" href="https://menu.matildaplatform.com/meals/week/68d18b0e30b565aba61bf59e_boras-ganghesterskolan-kok" target="_blank" rel="noopener noreferrer">Veckans matsedel</a></section><section class="card"><h2>NÄSTA LOV</h2><div style="font-size:23px;font-weight:750" id="break">Höstlov</div><div class="muted" id="breakdate">26–30 oktober 2026 (preliminärt)</div><div id="break-count" class="break-count"></div><p class="muted">Kontrollera läsårstider mot Borås Stads officiella uppgifter.</p></section></div>
