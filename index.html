@@ -125,9 +125,23 @@
  body.display-view [data-tv-hidden="true"]{display:none!important}
 }
 .tv-pager{font-size:11px;color:#b9c8d3;white-space:nowrap;margin-left:8px}
-.stress-panel{margin-top:10px}.stress-panel button:disabled{opacity:.45;cursor:not-allowed}</style></head><body class="display-view"><main>
+.stress-panel{margin-top:10px}.stress-panel button:disabled{opacity:.45;cursor:not-allowed}
+.rotation-indicator{display:none}
+@media(min-width:1000px){
+ body.display-view .top-overview{grid-template-columns:minmax(0,1.7fr) minmax(140px,.52fr) minmax(0,1.85fr) minmax(185px,.86fr)!important}
+ body.display-view .rotation-indicator{display:flex;align-items:center;justify-content:center;gap:9px;padding:8px!important}
+ body.display-view .rotation-indicator .hourglass{font-size:27px;line-height:1;animation:hourglass-spin 2.3s ease-in-out infinite}
+ body.display-view .rotation-copy{min-width:0;font-size:12px;line-height:1.25}
+ body.display-view .rotation-copy strong{font-size:10px;letter-spacing:.3px;display:block;margin-bottom:5px}
+ body.display-view #rotation-message{font-weight:700}
+ body.display-view .rotation-track{height:4px;border-radius:5px;background:#182735;overflow:hidden;margin-top:8px}
+ body.display-view #rotation-progress{display:block;height:100%;width:0;background:#a9c8dd}
+}
+@keyframes hourglass-spin{0%,42%{transform:rotate(0deg)}58%,100%{transform:rotate(180deg)}}
+@media(prefers-reduced-motion:reduce){.rotation-indicator .hourglass{animation:none!important}}
+</style></head><body class="display-view"><main>
 <header><div><h1>RESURSTEAMET</h1><div class="muted">Arbetsrummets informationstavla</div></div><div class="mode-controls"><button type="button" id="display-mode" aria-pressed="true">Storbildsläge</button><button type="button" id="edit-mode" aria-pressed="false">Redigeringsläge</button></div><div><div class="clock" id="clock">--:--</div><div id="date" class="muted"></div></div></header>
-<div class="grid summary-grid top-overview"><section class="card"><h2>DAGENS VÄDER · BORÅS</h2><div class="weather-primary"><span id="weather-icon" role="img" aria-label="Väder">🌤️</span><div class="temp" id="temp">--°</div></div><div id="weather" class="muted">Hämtar aktuellt väder …</div></section><section class="card lunch-card"><h2>DAGENS MATSEDEL · GÅNGHESTERSKOLAN</h2><div id="meal-date" class="muted"></div><div id="meal-content" class="meal-content">Hämtar matsedeln …</div><a class="link" href="https://menu.matildaplatform.com/meals/week/68d18b0e30b565aba61bf59e_boras-ganghesterskolan-kok" target="_blank" rel="noopener noreferrer">Veckans matsedel</a></section><section class="card"><h2>NÄSTA LOV</h2><div style="font-size:23px;font-weight:750" id="break">Höstlov</div><div class="muted" id="breakdate">26–30 oktober 2026 (preliminärt)</div><div id="break-count" class="break-count"></div><p class="muted">Kontrollera läsårstider mot Borås Stads officiella uppgifter.</p></section></div>
+<div class="grid summary-grid top-overview"><section class="card"><h2>DAGENS VÄDER · BORÅS</h2><div class="weather-primary"><span id="weather-icon" role="img" aria-label="Väder">🌤️</span><div class="temp" id="temp">--°</div></div><div id="weather" class="muted">Hämtar aktuellt väder …</div></section><section class="card rotation-indicator" aria-label="Automatisk växling"><div class="hourglass" aria-hidden="true">⌛</div><div class="rotation-copy"><strong>AUTOMATISK VÄXLING</strong><div id="rotation-message">Kontrollerar vyer …</div><div class="rotation-track"><span id="rotation-progress"></span></div></div></section><section class="card lunch-card"><h2>DAGENS MATSEDEL · GÅNGHESTERSKOLAN</h2><div id="meal-date" class="muted"></div><div id="meal-content" class="meal-content">Hämtar matsedeln …</div><a class="link" href="https://menu.matildaplatform.com/meals/week/68d18b0e30b565aba61bf59e_boras-ganghesterskolan-kok" target="_blank" rel="noopener noreferrer">Veckans matsedel</a></section><section class="card"><h2>NÄSTA LOV</h2><div style="font-size:23px;font-weight:750" id="break">Höstlov</div><div class="muted" id="breakdate">26–30 oktober 2026 (preliminärt)</div><div id="break-count" class="break-count"></div><p class="muted">Kontrollera läsårstider mot Borås Stads officiella uppgifter.</p></section></div>
 <div class="calendar-layout"><section class="card"><h2>DAGENS AKTIVITETER</h2><div class="muted" id="today-label"></div><div id="today-events" style="margin-top:14px" aria-live="polite"></div></section><section class="card"><div class="week-head"><h2 style="margin:0">VECKOKALENDER</h2><div><button id="prev-week" aria-label="Föregående vecka">‹</button> <strong id="week-range" style="font-size:13px"></strong> <button id="next-week" aria-label="Nästa vecka">›</button> <button id="current-week">Idag</button></div></div><div class="week-grid" id="week-grid"></div></section></div>
 <div class="workload-row"><section class="card pending-panel"><div class="week-head"><h2 style="margin:0">VÄNTANDE UPPDRAG <span class="muted">· DEMO</span></h2><span class="muted" id="pending-count"></span></div><div class="small-note">Endast testuppgifter – skriv inte in riktiga skolor, elevuppgifter eller ärenden här. Uppgifter i demon sparas inte.</div><div id="pending-list" class="pending-list"></div></section>
 <section class="card placement-panel"><div class="week-head"><h2 style="margin:0">PLACERINGAR & UTSKOLNING <span class="muted">· DEMO</span></h2><span id="placement-count" class="muted"></span></div><div class="small-note">Påhittade exempel. Nedräkning till angivet slutdatum i kalenderdagar – inte en automatisk juridisk bedömning.</div><div class="placement-list" id="placement-list"></div></section></div>
@@ -308,7 +322,18 @@ function updateTvPages(){
   label.textContent=isTV&&pages>1?'Aktiviteter '+(tvPage%pages+1)+'/'+pages:'';
  });
 }
-setInterval(()=>{tvPage++;updateTvPages();},12000);
+const rotationDuration=12000;let rotationStarted=Date.now();
+function updateRotationIndicator(){
+ const remaining=Math.max(1,Math.ceil((rotationDuration-(Date.now()-rotationStarted)%rotationDuration)/1000));
+ const isTV=document.body.classList.contains('display-view');
+ const groups=[{name:'dagens aktiviteter',count:document.querySelectorAll('#today-events .activity').length},{name:'väntande uppdrag',count:document.querySelectorAll('#pending-list .pending-item').length},{name:'placeringar',count:document.querySelectorAll('#placement-list .placement-item').length}];
+ const changes=groups.filter(g=>g.count>4);
+ document.getElementById('rotation-message').textContent=changes.length?'Nästa vy om '+remaining+' s':'All information visas';
+ document.getElementById('rotation-progress').style.width=changes.length?(100*(rotationDuration-(Date.now()-rotationStarted)%rotationDuration)/rotationDuration)+'%':'100%';
+ document.querySelector('.rotation-indicator .hourglass').style.animationPlayState=isTV&&changes.length?'running':'paused';
+}
+setInterval(()=>{tvPage++;rotationStarted=Date.now();updateTvPages();updateRotationIndicator();},rotationDuration);
+setInterval(updateRotationIndicator,250);updateRotationIndicator();
 setInterval(updateTvPages,1500);
 
 let stressBackup=null;
