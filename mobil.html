@@ -51,7 +51,7 @@ function renderStudents(){
 function renderHomeMeetings(){
  const root=$('home-meetings');root.replaceChildren();
  const examples=[{start:'09:00',end:'09:20',kind:'Morgonavstämning',person:null},{start:'13:30',end:'14:15',kind:'Pedagogiskt möte',person:people[1]}];
- const all=examples.concat(appointments.filter(x=>x.date===today)).sort((a,b)=>a.start.localeCompare(b.start));
+ const all=examples.concat(visibleAppointments().filter(x=>x.date===today)).sort((a,b)=>a.start.localeCompare(b.start));
  for(const meeting of all){
   const item=document.createElement('div');item.className='home-meeting';
   if(meeting.person)item.style.borderLeftColor=colored(meeting.person);
@@ -67,6 +67,40 @@ const colors=['#2877bc','#b362b8','#e98c29','#24866a','#c34f61'];
 const calendarKey='resursteamet_mobile_calendar_demo_v2';
 let appointments=[];try{const v=JSON.parse(sessionStorage.getItem(calendarKey)||'[]');if(Array.isArray(v))appointments=v.filter(x=>x&&people.includes(x.person)&&Dashboard.isDate(x.date)&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(x.start)&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(x.end)&&x.end>x.start&&typeof x.kind==='string'&&typeof x.note==='string'&&(!x.student||/^Elev [A-J]$/.test(x.student))).slice(0,200);}catch(e){}
 let chosenDate=today,editingAppointment=null;
+// Fiktiva exempel visas utan att skriva över användarens egna testbokningar.
+function exampleAppointments(){
+ const monday=weekStart(new Date());
+ const examples=[
+ [-3,0,'09:00','10:00','Pedagogiskt möte',''],
+ [-2,2,'10:15','11:30','Observation',''],
+ [-1,3,'08:30','11:45','Utskolning','Elev C'],
+ [0,0,'09:00','10:15','Uppföljningsmöte',''],
+ [0,1,'10:30','12:00','Handled ning',''],
+ [0,3,'13:00','14:15','Observation',''],
+ [1,2,'08:45','11:30','Utskolning','Elev B'],
+ [1,4,'13:00','14:00','Inledande möte',''],
+ [2,0,'09:15','10:45','Pedagogiskt möte',''],
+ [2,1,'11:00','12:00','Observation',''],
+ [2,3,'13:30','15:00','Handledning',''],
+ [3,4,'09:00','11:00','Utskolning','Elev F'],
+ [3,2,'13:00','14:30','Uppföljningsmöte',''],
+ [4,1,'09:30','10:15','Avslutande möte',''],
+ [7,0,'08:30','10:00','Observation',''],
+ [8,3,'09:00','12:00','Utskolning','Elev A'],
+ [9,4,'13:15','14:45','Pedagogiskt möte',''],
+ [10,2,'10:00','11:30','Handledning',''],
+ [14,1,'09:00','10:30','Inledande möte',''],
+ [15,0,'10:15','12:00','Utskolning','Elev G'],
+ [16,3,'13:00','14:15','Observation',''],
+ [21,4,'08:30','10:00','Uppföljningsmöte',''],
+ [22,2,'10:30','12:15','Utskolning','Elev H'],
+ [23,0,'13:00','14:00','Pedagogiskt möte','']
+ ];
+ return examples.map(([offset,person,start,end,kind,student],i)=>({id:'demo-example-'+i,date:key(add(monday,offset)),person:people[person],start,end,kind:kind==='Handled ning'?'Handledning':kind,student,note:''}));
+}
+const demoExamples=exampleAppointments();
+function visibleAppointments(){return demoExamples.concat(appointments);}
+
 const colored=(p)=>colors[people.indexOf(p)]||'#567';
 function storeAppointments(){try{sessionStorage.setItem(calendarKey,JSON.stringify(appointments));}catch(e){}}
 const legend=$('person-legend');people.forEach((p,i)=>{const item=document.createElement('span');item.className='legend-item';const dot=document.createElement('i');dot.style.background=colors[i];item.append(dot,document.createTextNode(p));legend.append(item);const opt=document.createElement('option');opt.value=p;opt.textContent=p;$('appt-person').append(opt);});
@@ -80,7 +114,7 @@ $('appointment-form').addEventListener('submit',e=>{e.preventDefault();const ite
 function renderAgenda(){
  const root=$('agenda-list');root.replaceChildren();
  $('agenda-heading').textContent='Aktiviteter · '+day(chosenDate).toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'short'});
- const matches=appointments.filter(x=>x.date===chosenDate).sort((a,b)=>a.start.localeCompare(b.start)||people.indexOf(a.person)-people.indexOf(b.person));
+ const matches=visibleAppointments().filter(x=>x.date===chosenDate).sort((a,b)=>a.start.localeCompare(b.start)||people.indexOf(a.person)-people.indexOf(b.person));
  const summary=document.createElement('p');summary.className='note';const exits=matches.filter(x=>x.kind==='Utskolning').length;summary.textContent=matches.length+' aktiviteter · '+new Set(matches.map(x=>x.person)).size+' medarbetare med bokningar'+(exits?' · '+exits+' utskolning'+(exits===1?'':'ar'):'');root.append(summary);
  if(!matches.length){const p=document.createElement('p');p.className='note';p.textContent='Inga inlagda testaktiviteter denna dag. Tryck på Nytt möte för att planera.';root.append(p);}
  for(const x of matches){
@@ -90,9 +124,9 @@ function renderAgenda(){
   const sub=document.createElement('div');sub.className='note';sub.textContent=x.person+(x.student?' · '+x.student:'')+(x.note?' · '+x.note:'');
   line.append(t,sub);
   const actions=document.createElement('div');actions.className='agenda-actions';
-  const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Ändra';edit.addEventListener('click',()=>openAppointment(x));
-  const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Ta bort';del.setAttribute('aria-label','Ta bort '+x.kind+' för '+x.person+' '+x.start);del.addEventListener('click',()=>{if(!confirm('Ta bort testaktiviteten?'))return;appointments=appointments.filter(a=>a.id!==x.id);storeAppointments();renderHorizon();renderAgenda();renderHomeMeetings();});
-  actions.append(edit,del);row.append(line,actions);root.append(row);
+  const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Ändra';edit.addEventListener('click',()=>openAppointment(x));if(x.id.startsWith('demo-example-')){edit.disabled=true;edit.title='Förifyllt exempel kan inte ändras';}
+  const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Ta bort';del.setAttribute('aria-label','Ta bort '+x.kind+' för '+x.person+' '+x.start);del.addEventListener('click',()=>{if(x.id.startsWith('demo-example-'))return;if(!confirm('Ta bort testaktiviteten?'))return;appointments=appointments.filter(a=>a.id!==x.id);storeAppointments();renderHorizon();renderAgenda();renderHomeMeetings();});
+  if(!x.id.startsWith('demo-example-'))actions.append(edit,del);row.append(line,actions);root.append(row);
  }
  const unavailable=document.createElement('div');unavailable.className='availability-summary';
  const head=document.createElement('h3');head.textContent='Teamets bokningar idag';unavailable.append(head);
@@ -114,7 +148,7 @@ function renderHorizon(){
    const name=document.createElement('span');name.textContent=['M','T','O','T','F','L','S'][d];
    const num=document.createElement('strong');num.textContent=String(date.getDate());
    btn.append(name,num);
-   const daily=appointments.filter(x=>x.date===dt).sort((a,b)=>a.start.localeCompare(b.start));
+   const daily=visibleAppointments().filter(x=>x.date===dt).sort((a,b)=>a.start.localeCompare(b.start));
    for(const entry of daily.slice(0,3)){
     const label=document.createElement('span');label.className='calendar-meeting'+(entry.kind==='Utskolning'?' exit-meeting':'');label.style.borderLeftColor=colored(entry.person);
     label.textContent=entry.start+' '+(entry.kind==='Utskolning'?'UTSKOLNING':'')+(entry.kind==='Utskolning'&&entry.student?' · '+entry.student:entry.kind==='Utskolning'?'':' '+entry.kind);label.title=entry.person+' · '+entry.start+'–'+entry.end+' · '+entry.kind+(entry.student?' · '+entry.student:'');
