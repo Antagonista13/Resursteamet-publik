@@ -30,7 +30,8 @@ window.Dashboard = (() => {
   }
   const staff = ['A','B','C','D','E'].map((code,index)=>({id:'staff-'+code.toLowerCase(),name:'Medarbetare '+code,index}));
   const assignments = new Map();
-  const statuses = ['På plats','På uppdrag','Ej tillgänglig'];
+  const statuses = ['På plats','Inledande möte','Pedagogiskt möte','Uppföljningsmöte','Avslutande möte','Utskolning','Observation','Handledning','Privat','Annat','Frånvarande'];
+  const timeSlots = ['08–10','10–12','12–14','14–16'];
   function renderStaff(root, selected, view) {
     const start = addDays(selected,-(selected.getDay()+6)%7);
     const dates = view === 'day' ? [selected] : Array.from({length:5},(_,i)=>addDays(start,i));
@@ -40,13 +41,17 @@ window.Dashboard = (() => {
       const heading = document.createElement('h3'); heading.textContent=person.name;
       const slots = document.createElement('div'); slots.className='staff-slots';
       for (const date of dates) {
-        const key=person.id+':'+dateKey(date);
-        const label=document.createElement('label'); label.textContent=date.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
-        const input=document.createElement('select'); input.setAttribute('aria-label',person.name+', '+dateKey(date));
-        for(const status of statuses){const option=document.createElement('option');option.textContent=status;option.value=status;input.append(option);}
-        input.value=assignments.get(key) || (date.getDay()===0 || date.getDay()===6 ? 'Ej tillgänglig' : 'På plats');
-        input.addEventListener('change',()=>assignments.set(key,input.value));
-        label.append(input);slots.append(label);
+        for (const slot of timeSlots) {
+          const key=person.id+':'+dateKey(date)+':'+slot;
+          const label=document.createElement('label');
+          label.textContent=date.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'})+' · '+slot;
+          const input=document.createElement('select');
+          input.setAttribute('aria-label',person.name+', '+dateKey(date)+', '+slot);
+          for(const status of statuses){const option=document.createElement('option');option.textContent=status;option.value=status;input.append(option);}
+          input.value=assignments.get(key) || (date.getDay()===0 || date.getDay()===6 ? 'Frånvarande' : 'På plats');
+          input.addEventListener('change',()=>assignments.set(key,input.value));
+          label.append(input);slots.append(label);
+        }
       }
       row.append(heading,slots);root.append(row);
     }
