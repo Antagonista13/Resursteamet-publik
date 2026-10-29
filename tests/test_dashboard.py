@@ -155,3 +155,70 @@ class DashboardTests(unittest.TestCase):
         self.open()
         self.assertNotIn('BROKEN',self.page.locator('#week-grid').inner_text())
         self.assertIn('ogiltig',self.page.locator('#demo-feedback').inner_text())
+
+    def test_five_staff_follow_selected_date_and_reset_on_reload(self):
+        self.open()
+        self.assertEqual(self.page.locator('.staff-person').count(),5)
+        self.assertEqual(self.page.locator('#staff-planning select').count(),25)
+        self.page.locator('#day-view').click()
+        status=self.page.get_by_label('Medarbetare A, 2026-10-29',exact=True)
+        self.assertEqual(status.input_value(),'På plats')
+        status.select_option('På uppdrag')
+        self.page.locator('#nav-next').click()
+        self.assertEqual(self.page.get_by_label('Medarbetare A, 2026-10-30',exact=True).input_value(),'På plats')
+        self.page.locator('#nav-prev').click()
+        self.assertEqual(status.input_value(),'På uppdrag')
+        self.page.reload(); self.page.locator('#day-view').click()
+        self.assertEqual(status.input_value(),'På plats')
+        self.page.locator('#display-mode').click()
+        self.assertFalse(self.page.locator('#staff-planning').is_visible())
+
+    def test_case_status_is_editable_but_not_persisted(self):
+        self.open(); self.edit_mode()
+        first=self.page.locator('#pending-list .pending-item').first
+        first.get_by_label('Status för Skola A',exact=True).select_option('Klar för start')
+        self.assertIn('Klar för start',first.locator('.pending-status').inner_text())
+        self.page.reload()
+        self.assertEqual(self.page.get_by_label('Status för Skola A',exact=True).input_value(),'Ny förfrågan')
+
+    def test_placement_dates_and_fictional_codes(self):
+        self.open(); self.edit_mode()
+        self.assertIn('Elev A',self.page.locator('#placement-list').inner_text())
+        self.assertNotIn('Slutdatum passerat',self.page.locator('#placement-list').inner_text())
+        self.page.locator('#placement-code').fill('Test C')
+        self.page.locator('#placement-start').fill('2026-11-03')
+        self.page.locator('#placement-end').fill('2026-11-02')
+        self.page.locator('#placement-form button').click()
+        self.assertIn('Slutdatum måste',self.page.locator('#placement-feedback').inner_text())
+        self.page.locator('#placement-end').fill('2026-11-06')
+        self.page.locator('#placement-form button').click()
+        self.assertEqual(self.page.locator('.placement-item').filter(has_text='Test C').count(),1)
+        self.page.locator('.placement-item').filter(has_text='Test C').get_by_role('button').click()
+        self.assertEqual(self.page.locator('.placement-item').filter(has_text='Test C').count(),0)
+
+    def test_configured_test_break_boundaries(self):
+        config={'version':1,'demo':True,'breaks':[{'name':'Exempellov','start':'2026-11-02','end':'2026-11-06'}]}
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=200,content_type='application/json',body=json.dumps(config)))
+        self.open()
+        self.assertIn('4 kalenderdagar',self.page.locator('#break-count').inner_text())
+        self.assertIn('TEST',self.page.locator('#break').inner_text())
+        for date,wanted in [(dt.datetime(2026,11,2,8,tzinfo=dt.timezone.utc),'pågår'),(dt.datetime(2026,11,6,8,tzinfo=dt.timezone.utc),'pågår'),(dt.datetime(2026,11,7,8,tzinfo=dt.timezone.utc),'Inget kommande testlov')]:
+            with self.subTest(date=date):
+                self.page.clock.set_system_time(date)
+                self.page.reload();self.page.wait_for_load_state('networkidle')
+                self.assertIn(wanted,self.page.locator('#break-count').inner_text())
+
+    def test_invalid_break_config_is_not_presented_as_verified_dates(self):
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=200,content_type='application/json',body=json.dumps({'version':1,'demo':True,'breaks':[{'name':'Bad','start':'2026-02-30','end':'2026-03-01'}]})))
+        self.open()
+        self.assertIn('kunde inte läsas',self.page.locator('#break-count').inner_text())
+        self.assertNotIn('Höstlov',self.page.locator('#break').inner_text())
+
+    def test_external_failures_and_stale_menu_are_honest(self):
+        self.page.route('https://**/*',lambda r:r.abort())
+        self.page.route('**/menu.json*',lambda r:r.fulfill(status=200,content_type='application/json',body='{"meals":[{"date":"2026-10-12","dishes":["GAMMAL RÄTT"]}]}'))
+        self.open()
+        self.assertIn('otillgängligt',self.page.locator('#weather').inner_text())
+        self.assertNotIn('GAMMAL RÄTT',self.page.locator('#meal-content').inner_text())
+        self.assertIn('Ingen meny',self.page.locator('#meal-content').inner_text())
+        self.assertEqual(self.errors,[])

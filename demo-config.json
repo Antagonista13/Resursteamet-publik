@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "demo": true,
+  "breaks": [
+    {"name": "Exempellov", "start": "2026-11-02", "end": "2026-11-06"},
+    {"name": "Exempel på vinterledighet", "start": "2026-12-21", "end": "2027-01-08"}
+  ]
+}

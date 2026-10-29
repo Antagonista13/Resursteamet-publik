@@ -28,5 +28,36 @@ window.Dashboard = (() => {
       {id:'demo-next',date:dateKey(addDays(now,1)),time:'09:00',source:'team',title:'TEST · Gemensam uppföljning'}
     ];
   }
-  return {dateKey,localDay,addDays,dayNumber,isDate,isEvent,readEvents,importEvents,seedEvents};
+  const staff = ['A','B','C','D','E'].map((code,index)=>({id:'staff-'+code.toLowerCase(),name:'Medarbetare '+code,index}));
+  const assignments = new Map();
+  const statuses = ['På plats','På uppdrag','Ej tillgänglig'];
+  function renderStaff(root, selected, view) {
+    const start = addDays(selected,-(selected.getDay()+6)%7);
+    const dates = view === 'day' ? [selected] : Array.from({length:5},(_,i)=>addDays(start,i));
+    root.replaceChildren();
+    for (const person of staff) {
+      const row = document.createElement('section'); row.className='staff-person';
+      const heading = document.createElement('h3'); heading.textContent=person.name;
+      const slots = document.createElement('div'); slots.className='staff-slots';
+      for (const date of dates) {
+        const key=person.id+':'+dateKey(date);
+        const label=document.createElement('label'); label.textContent=date.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
+        const input=document.createElement('select'); input.setAttribute('aria-label',person.name+', '+dateKey(date));
+        for(const status of statuses){const option=document.createElement('option');option.textContent=status;option.value=status;input.append(option);}
+        input.value=assignments.get(key) || (date.getDay()===0 || date.getDay()===6 ? 'Ej tillgänglig' : 'På plats');
+        input.addEventListener('change',()=>assignments.set(key,input.value));
+        label.append(input);slots.append(label);
+      }
+      row.append(heading,slots);root.append(row);
+    }
+  }
+  function renderBreak(config, now) {
+    if(config?.version!==1 || config.demo!==true || !Array.isArray(config.breaks) || config.breaks.length>100 || !config.breaks.every(b=>b && typeof b.name==='string' && b.name.trim() && b.name.length<=60 && isDate(b.start) && isDate(b.end) && b.end>=b.start)) throw Error('Ogiltiga testlov');
+    const today=dateKey(now);
+    const current=config.breaks.filter(b=>b.end>=today).sort((a,b)=>a.start.localeCompare(b.start))[0];
+    document.getElementById('break').textContent=current?'TEST · '+current.name:'TESTLOV';
+    document.getElementById('breakdate').textContent=current?current.start+' – '+current.end:'Ej officiella läsårstider';
+    document.getElementById('break-count').textContent=!current?'Inget kommande testlov angivet':current.start<=today?'Testlov pågår':(dayNumber(localDay(current.start))-dayNumber(now))+' kalenderdagar till testlov';
+  }
+  return {dateKey,localDay,addDays,dayNumber,isDate,isEvent,readEvents,importEvents,seedEvents,renderStaff,renderBreak};
 })();
