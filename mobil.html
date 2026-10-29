@@ -1,0 +1,200 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#10283b"><title>Resursteamet · Mobil DEMO</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#193149;background:#eff4f6}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2570aa;outline-offset:3px}.shell{max-width:660px;margin:auto;min-height:100vh;padding:18px 16px calc(105px + env(safe-area-inset-bottom))}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}.brand{font-size:11px;letter-spacing:.16em;font-weight:800;color:#407ba3}.top h1{margin:3px 0;font-size:27px}.muted{color:#668095;font-size:13px}.demo{font-size:10px;background:#fff2cf;color:#745900;border-radius:99px;padding:7px 10px;font-weight:750}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 3px 18px #12324e0a}.cards .card{min-width:0}.eyebrow{font-size:12px;font-weight:800;color:#385775;display:flex;gap:7px;align-items:center;margin-bottom:9px}.weather-number{font-size:36px;font-weight:800;line-height:1.2}.meal-text{font-size:14px;font-weight:650;line-height:1.4;overflow-wrap:anywhere}.detail{font-size:11px;color:#698095;margin-top:7px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}.section-head h2{font-size:17px;margin:0}.toggle{display:flex;background:#e9f0f4;border-radius:12px;padding:3px;gap:3px}.toggle button{background:transparent;border:0;border-radius:10px;font-size:12px;padding:7px 12px;color:#345168}.toggle button[aria-pressed=true]{background:white;box-shadow:0 1px 5px #1233;color:#143957;font-weight:800}.count{font-size:34px;font-weight:800}.student-pills{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}.student-pills span{white-space:nowrap;background:#e4f1f8;color:#1c618b;border-radius:99px;padding:8px 10px;font-size:12px;font-weight:750}.weekday,.staff-row,.slot-row,.contact-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #ecf0f4;gap:10px}.weekday:last-child,.staff-row:last-child,.slot-row:last-child,.contact-row:last-child{border:0}.staff-row strong,.slot-row strong{font-size:13px}.status{font-size:12px;color:#52708a;text-align:right}.tag{font-size:11px;background:#e8f4ed;color:#227348;padding:5px 8px;border-radius:8px;white-space:nowrap}.primary{background:#17689c;color:#fff;border:0;border-radius:12px;padding:11px 14px;font-weight:750}.secondary{background:#e8f2f8;color:#175e89;border:0;border-radius:12px;padding:10px 12px;font-weight:700}.full{width:100%}.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #dce7ed;display:flex;justify-content:space-around;padding:9px max(8px,calc((100vw - 660px)/2)) calc(9px + env(safe-area-inset-bottom));box-shadow:0 -5px 25px #17304d12;z-index:3}.bottom button{background:transparent;border:0;color:#71879a;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;min-width:57px;min-height:52px;padding:6px 1px}.bottom button[aria-current=page]{color:#0b659b;font-weight:800}.bottom svg{height:22px;width:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.screen[hidden]{display:none}.row-actions{display:flex;gap:8px;flex-wrap:wrap}.field{display:block;font-size:12px;font-weight:750;margin:11px 0}.field select,.field input{display:block;width:100%;background:#f7fafb;border:1px solid #cbdce5;border-radius:10px;padding:12px;margin-top:6px}.note{font-size:12px;color:#6b7e8d;line-height:1.6}.week-card{background:#f4f8fa;padding:12px;border-radius:13px;margin:10px 0}.week-card h3{font-size:14px;margin:0 0 6px}.event-line{font-size:12px;padding:5px 0;border-bottom:1px solid #e3ebef}.event-line:last-child{border:0}.chip{display:inline-block;background:#e7eff5;border-radius:6px;padding:3px 6px;margin:2px;font-size:11px}.notice{padding:10px;background:#fff3d9;border-radius:12px;color:#705c27;font-size:12px;margin:12px 0}@media(min-width:600px){.shell{padding-top:28px}.cards{gap:15px}.card{padding:20px}}@media(max-width:360px){.shell{padding:13px 10px calc(100px + env(safe-area-inset-bottom))}.card{padding:12px}.bottom button{min-width:50px}.top h1{font-size:24px}}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px}.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#476479;background:#f1f6f9;padding:5px 7px;border-radius:9px}.legend-item i,.day-dots i{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}.compact-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.calendar-day{border:1px solid #e2eaf0;background:#fff;border-radius:9px;min-width:0;min-height:72px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;color:#2b4e68}.calendar-day>span:first-child{font-size:10px}.calendar-day strong{font-size:15px}.calendar-day{min-height:115px;justify-content:flex-start}.exit-meeting{background:#fff0d9!important;font-weight:800;color:#704510!important}.calendar-meeting{display:block;max-width:100%;width:100%;font-size:9px;text-align:left;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#f0f4f8;border-left:3px solid;border-radius:3px;padding:3px 2px}.calendar-more,.calendar-empty{font-size:9px;color:#668095}.calendar-day.chosen{border:2px solid #237ab3;background:#e9f3fa}.day-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;min-height:8px}.day-dots i{width:5px;height:5px}.agenda-row{border-left:4px solid #467;padding:9px 8px;margin:7px 0;background:#f2f7fa;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:7px}.agenda-row strong{font-size:12px}.agenda-row button{font-size:11px}.agenda-description{min-width:0;overflow-wrap:anywhere}.agenda-actions{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.agenda-actions button{padding:7px 8px}.availability-summary{border-top:1px solid #e2eaf0;margin-top:16px;padding-top:8px}.availability-summary h3{font-size:14px}.availability-person{display:flex;align-items:center;gap:7px;border-bottom:1px solid #eef2f4;padding:8px 0;font-size:12px}.availability-person i{display:inline-block;width:9px;height:9px;border-radius:50%;flex-shrink:0}.availability-person span{margin-left:auto;color:#627e91;text-align:right}.week-card{padding:10px}.week-card h3{margin:0 0 10px}.home-board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:stretch}.home-board-card{min-width:0}.board-title{min-height:26px;margin-bottom:9px}.board-title h2{font-size:16px;line-height:1.25}.board-toggle{margin-bottom:10px;width:max-content;max-width:100%}.board-toggle button{padding:6px 9px}.student-total{font-size:12px;color:#466781;font-weight:750;margin:7px 0}.pupil-row{display:flex;align-items:center;justify-content:space-between;gap:3px;border-bottom:1px solid #edf1f4;padding:8px 0;font-size:12px}.pupil-row strong{min-width:0;overflow-wrap:anywhere}.pupil-row span{color:#58758b;white-space:nowrap}.home-meeting{border-left:3px solid #a5b5c4;padding:8px 5px;margin:7px 0;background:#f3f7f9;border-radius:5px;display:flex;flex-direction:column;gap:3px}.home-meeting strong{font-size:11px}.home-meeting span{font-size:12px;line-height:1.35;overflow-wrap:anywhere}.home-meeting.is-exit{background:#fff0d9;font-weight:750}.home-calendar-button{width:100%;margin-top:10px;font-size:12px}@media(max-width:400px){.home-board{gap:7px}.home-board-card{padding:11px}.board-title h2{font-size:14px}.pupil-row,.home-meeting span{font-size:11px}.board-toggle button{font-size:11px;padding:6px 7px}}</style></head><body>
+<main class="shell"><header class="top"><div><div class="brand">RESURSTEAMET</div><h1 id="screen-title">Översikt idag</h1><div class="muted" id="date-heading"></div></div><span class="demo">DEMO</span></header>
+<section class="screen" id="screen-idag">
+<div class="cards"><article class="card"><div class="eyebrow">☁ VÄDER · BORÅS</div><div class="weather-number" id="weather-temp">—°</div><div class="detail" id="weather-text">Hämtar väder …</div></article><article class="card"><div class="eyebrow">♨ MATSEDEL</div><div class="meal-text" id="menu-today">Hämtar dagens lunch …</div><div class="detail" id="menu-detail">Gånghesterskolan</div></article></div>
+<div class="home-board">
+<article class="card home-board-card"><div class="section-head board-title"><h2>Elever på plats</h2></div><div class="toggle board-toggle"><button id="student-today" aria-pressed="true">Idag</button><button id="student-week" aria-pressed="false">Veckan</button></div><div id="student-content"></div><p class="note">Planerade elever · fiktiva uppgifter</p></article>
+<article class="card home-board-card"><div class="section-head board-title"><h2>Dagens möten</h2></div><div id="home-meetings"></div><button type="button" class="secondary home-calendar-button" data-goto="planering">Öppna kalendern</button></article>
+</div>
+<article class="card"><div class="section-head"><h2>Väntande ärenden</h2><span class="tag">DEMO</span></div><div class="weekday"><strong>Skola A</strong><span class="status">Ny förfrågan</span></div><div class="weekday"><strong>Skola B</strong><span class="status">Inväntar beslut</span></div><div class="weekday"><strong>Skola C</strong><span class="status">Planerad start</span></div><p class="note">Endast fiktiva ärenden. Riktiga uppgifter kräver skyddad åtkomst.</p></article>
+</section>
+<section class="screen" id="screen-planering" hidden>
+<article class="card"><div class="section-head"><h2>Teamets kalender</h2><label class="field" style="margin:0">Visa <select id="horizon-select"><option value="4">4 veckor</option><option value="5">5 veckor</option><option value="6" selected>6 veckor</option></select></label></div><div class="calendar-legend" id="person-legend"></div><div id="horizon-list"></div></article>
+<article class="card"><div class="section-head"><h2 id="agenda-heading">Vald dag</h2><button type="button" class="secondary" id="new-appointment">+ Nytt möte</button></div><div id="agenda-list"></div></article>
+<article class="card" id="appointment-editor" hidden><h2 id="appointment-title">Lägg till aktivitet</h2><p class="note">Demon lagrar endast fiktiva kalenderposter i den här webbläsarfliken.</p><form id="appointment-form"><label class="field">Medarbetare<select id="appt-person"></select></label><label class="field">Datum<input id="plan-date" type="date" required></label><div class="cards"><label class="field">Från<input id="appt-start" type="time" value="09:00" required></label><label class="field">Till<input id="appt-end" type="time" value="10:00" required></label></div><label class="field">Aktivitet<select id="appt-kind"></select></label><label class="field" id="student-link-field" hidden>Elev (endast fiktiv kod)<select id="appt-student"><option value="">Ingen elev kopplad</option><option>Elev A</option><option>Elev B</option><option>Elev C</option><option>Elev D</option><option>Elev E</option><option>Elev F</option><option>Elev G</option><option>Elev H</option><option>Elev I</option><option>Elev J</option></select></label><label class="field">Anteckning (endast påhittad)<input id="appt-note" maxlength="60" placeholder="Valfri kort text"></label><p class="note" id="appt-feedback" role="status"></p><div class="row-actions"><button class="primary" type="submit">Spara</button><button class="secondary" type="button" id="cancel-appointment">Avbryt</button></div></form></article>
+</section>
+<section class="screen" id="screen-teamet" hidden><article class="card"><h2>Teamets aktiviteter idag</h2><div id="team-list"></div><p class="note">Här visas bara möten och andra aktiviteter än På plats, en gång per aktivitet. Personalnamn och aktiviteter är påhittade i testversionen.</p></article></section>
+<section class="screen" id="screen-kontakter" hidden><article class="card"><h2>Viktiga kontakter</h2><p class="note">Här kommer sökbara tjänstekontakter med ring- och mejlgenvägar i den behörighetsskyddade versionen.</p><div class="contact-row"><strong>Resursteamet · expedition</strong><span class="tag">Exempel</span></div><div class="contact-row"><strong>Skola A · samordning</strong><span class="tag">Exempel</span></div><div class="contact-row"><strong>Skola B · administration</strong><span class="tag">Exempel</span></div></article></section>
+<section class="screen" id="screen-mer" hidden><article class="card"><h2>Mer</h2><p class="note">Det här är en offentlig, fristående demonstration utan inloggning. Använd aldrig riktiga elevuppgifter, kontaktuppgifter eller arbetsärenden här.</p><a href="index.html" class="secondary" style="display:inline-block;text-decoration:none">Öppna TV-dashboarden</a></article></section>
+</main><nav class="bottom" aria-label="Huvudmeny">
+<button data-tab="idag" aria-current="page"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg>Idag</button>
+<button data-tab="planering"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18M8 14h3M13 14h3"/></svg>Planering</button>
+<button data-tab="teamet"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2"/><path d="M2 20c0-8 12-8 12 0M14 17c4-3 8 0 8 3"/></svg>Teamet</button>
+<button data-tab="kontakter"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 18c0-5 10-5 10 0"/></svg>Kontakter</button>
+<button data-tab="mer"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Mer</button>
+</nav><script src="dashboard.js"></script><script>
+(function(){'use strict';
+const $=id=>document.getElementById(id),key=Dashboard.dateKey,day=Dashboard.localDay,add=Dashboard.addDays;
+const now=new Date(),today=key(now),weekStart=d=>{const z=day(key(d));z.setDate(z.getDate()-(z.getDay()+6)%7);return z;};
+$('date-heading').textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const people=['Medarbetare A','Medarbetare B','Medarbetare C','Medarbetare D','Medarbetare E'],slots=['08–10','10–12','12–14','14–16'],options=['På plats','Inledande möte','Pedagogiskt möte','Uppföljningsmöte','Avslutande möte','Utskolning','Observation','Handledning','Privat','Annat','Frånvarande'];
+let planning={};try{const x=JSON.parse(sessionStorage.getItem('resursteamet_mobile_demo_v1')||'{}');if(x&&typeof x==='object'&&!Array.isArray(x))planning=x;}catch(e){}
+function activity(person,date,slot){
+ const [from,to]=slot.split('–').map(hour=>hour.padStart(2,'0')+':00');
+ const bookings=visibleAppointments().filter(x=>x.person===person&&x.date===date&&x.start<to&&x.end>from).sort((a,b)=>a.start.localeCompare(b.start));
+ if(bookings.length)return bookings.map(x=>x.start+'–'+x.end+' · '+x.kind+(x.student?' · '+x.student:'')).join(' / ');
+ const v=planning[person+'|'+date+'|'+slot];
+ return person===people[0]&&options.includes(v)&&v!=='På plats'?v:'Ingen bokning';
+}
+function tab(name){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!=='screen-'+name);document.querySelectorAll('[data-tab]').forEach(x=>{if(x.dataset.tab===name)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current');});$('screen-title').textContent=({idag:'Översikt idag',planering:'Min planering',teamet:'Teamet',kontakter:'Kontakter',mer:'Mer'})[name];if(name==='planering')renderPlan();if(name==='teamet'){renderTeam();}window.scrollTo(0,0);}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.goto)));
+let studentMode='today';
+const students=Array.from({length:10},(_,i)=>({name:'Elev '+String.fromCharCode(65+i),grade:[4,5,6,7,8,5,6,7,9,8][i]}));
+function renderStudents(){
+ const root=$('student-content');root.replaceChildren();
+ if(studentMode==='today'){
+  const total=document.createElement('div');total.className='student-total';total.textContent=students.length+' planerade';root.append(total);
+  for(const pupil of students){const row=document.createElement('div');row.className='pupil-row';const name=document.createElement('strong');name.textContent=pupil.name;const grade=document.createElement('span');grade.textContent='Åk '+pupil.grade;row.append(name,grade);root.append(row);}
+ }else{
+  ['Mån','Tis','Ons','Tor','Fre'].forEach((name,i)=>{const row=document.createElement('div');row.className='pupil-row';const day=document.createElement('strong');day.textContent=name;const count=document.createElement('span');count.textContent=[10,8,9,10,7][i]+' elever';row.append(day,count);root.append(row);});
+ }
+ ['today','week'].forEach(v=>$('student-'+v).setAttribute('aria-pressed',String(studentMode===v)));
+}
+['today','week'].forEach(v=>$('student-'+v).addEventListener('click',()=>{studentMode=v;renderStudents();}));
+function renderHomeMeetings(){
+ const root=$('home-meetings');root.replaceChildren();
+ const all=visibleAppointments().filter(x=>x.date===today).sort((a,b)=>a.start.localeCompare(b.start)||people.indexOf(a.person)-people.indexOf(b.person));
+ for(const meeting of all){
+  const item=document.createElement('div');item.className='home-meeting';
+  if(meeting.person)item.style.borderLeftColor=colored(meeting.person);
+  if(meeting.kind==='Utskolning')item.classList.add('is-exit');
+  const time=document.createElement('strong');time.textContent=meeting.start;
+  const description=document.createElement('span');description.textContent=meeting.kind+(meeting.student?' · '+meeting.student:'')+(meeting.person?' · '+meeting.person.replace('Medarbetare ',''):'');
+  item.append(time,description);root.append(item);
+ }
+ if(!all.length){const p=document.createElement('p');p.className='note';p.textContent='Inga möten idag';root.append(p);}
+}
+
+const colors=['#2877bc','#b362b8','#e98c29','#24866a','#c34f61'];
+const calendarKey='resursteamet_mobile_calendar_demo_v2';
+let appointments=[];try{const v=JSON.parse(sessionStorage.getItem(calendarKey)||'[]');if(Array.isArray(v))appointments=v.filter(x=>x&&people.includes(x.person)&&Dashboard.isDate(x.date)&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(x.start)&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(x.end)&&x.end>x.start&&typeof x.kind==='string'&&typeof x.note==='string'&&(!x.student||/^Elev [A-J]$/.test(x.student))).slice(0,200);}catch(e){}
+let chosenDate=today,editingAppointment=null;
+// Fiktiva exempel visas utan att skriva över användarens egna testbokningar.
+function exampleAppointments(){
+ const monday=weekStart(new Date());
+ const dailyExamples=[{start:'08:15',end:'09:00',kind:'Morgonavstämning',person:people[0]},{start:'09:00',end:'10:30',kind:'Observation',person:people[2]},{start:'10:00',end:'12:00',kind:'Utskolning',person:people[3],student:'Elev C'},{start:'11:15',end:'12:00',kind:'Handled ning'.replace(' ',''),person:people[1]},{start:'13:00',end:'14:00',kind:'Pedagogiskt möte',person:people[4]},{start:'14:15',end:'15:00',kind:'Uppföljningsmöte',person:people[0]}];
+ const examples=[
+ [-3,0,'09:00','10:00','Pedagogiskt möte',''],
+ [-2,2,'10:15','11:30','Observation',''],
+ [-1,3,'08:30','11:45','Utskolning','Elev C'],
+ [0,0,'09:00','10:15','Uppföljningsmöte',''],
+ [0,1,'10:30','12:00','Handled ning',''],
+ [0,3,'13:00','14:15','Observation',''],
+ [1,2,'08:45','11:30','Utskolning','Elev B'],
+ [1,4,'13:00','14:00','Inledande möte',''],
+ [2,0,'09:15','10:45','Pedagogiskt möte',''],
+ [2,1,'11:00','12:00','Observation',''],
+ [2,3,'13:30','15:00','Handledning',''],
+ [3,4,'09:00','11:00','Utskolning','Elev F'],
+ [3,2,'13:00','14:30','Uppföljningsmöte',''],
+ [4,1,'09:30','10:15','Avslutande möte',''],
+ [7,0,'08:30','10:00','Observation',''],
+ [8,3,'09:00','12:00','Utskolning','Elev A'],
+ [9,4,'13:15','14:45','Pedagogiskt möte',''],
+ [10,2,'10:00','11:30','Handledning',''],
+ [14,1,'09:00','10:30','Inledande möte',''],
+ [15,0,'10:15','12:00','Utskolning','Elev G'],
+ [16,3,'13:00','14:15','Observation',''],
+ [21,4,'08:30','10:00','Uppföljningsmöte',''],
+ [22,2,'10:30','12:15','Utskolning','Elev H'],
+ [23,0,'13:00','14:00','Pedagogiskt möte','']
+ ];
+ return examples.map(([offset,person,start,end,kind,student],i)=>({id:'demo-example-'+i,date:key(add(monday,offset)),person:people[person],start,end,kind:kind==='Handled ning'?'Handledning':kind,student,note:''})).concat(dailyExamples.map((entry,i)=>({...entry,id:'demo-example-today-'+i,date:today,note:''})));
+}
+const demoExamples=exampleAppointments();
+function visibleAppointments(){return demoExamples.concat(appointments);}
+
+const colored=(p)=>colors[people.indexOf(p)]||'#567';
+function storeAppointments(){try{sessionStorage.setItem(calendarKey,JSON.stringify(appointments));}catch(e){}}
+const legend=$('person-legend');people.forEach((p,i)=>{const item=document.createElement('span');item.className='legend-item';const dot=document.createElement('i');dot.style.background=colors[i];item.append(dot,document.createTextNode(p));legend.append(item);const opt=document.createElement('option');opt.value=p;opt.textContent=p;$('appt-person').append(opt);});
+options.filter(x=>x!=='På plats').forEach(a=>{const opt=document.createElement('option');opt.value=a;opt.textContent=a;$('appt-kind').append(opt);});
+function toggleStudentLink(){$('student-link-field').hidden=$('appt-kind').value!=='Utskolning';if($('student-link-field').hidden)$('appt-student').value='';}
+$('appt-kind').addEventListener('change',toggleStudentLink);
+function openAppointment(entry=null){editingAppointment=entry?entry.id:null;$('appointment-title').textContent=entry?'Ändra aktivitet':'Ny aktivitet';$('appt-person').value=entry?.person||people[0];$('plan-date').value=entry?.date||chosenDate;$('appt-start').value=entry?.start||'09:00';$('appt-end').value=entry?.end||'10:00';$('appt-kind').value=entry?.kind||'Pedagogiskt möte';$('appt-note').value=entry?.note||'';$('appt-student').value=entry?.student||'';toggleStudentLink();$('appt-feedback').textContent='';$('appointment-editor').hidden=false;$('appointment-editor').scrollIntoView({behavior:'smooth',block:'start'});}
+function closeAppointment(){$('appointment-editor').hidden=true;editingAppointment=null;}
+$('new-appointment').addEventListener('click',()=>openAppointment());$('cancel-appointment').addEventListener('click',closeAppointment);
+$('appointment-form').addEventListener('submit',e=>{e.preventDefault();const item={id:editingAppointment||String(Date.now())+'-'+Math.random().toString(36).slice(2),person:$('appt-person').value,date:$('plan-date').value,start:$('appt-start').value,end:$('appt-end').value,kind:$('appt-kind').value,student:$('appt-kind').value==='Utskolning' ? $('appt-student').value : '',note:$('appt-note').value.trim()};if(!Dashboard.isDate(item.date)||item.end<=item.start){$('appt-feedback').textContent='Kontrollera datum och sluttid.';return;}if(!editingAppointment&&appointments.length>=200){$('appt-feedback').textContent='Max 200 testaktiviteter.';return;}appointments=appointments.filter(x=>x.id!==item.id);appointments.push(item);chosenDate=item.date;storeAppointments();closeAppointment();renderHorizon();renderAgenda();renderHomeMeetings();renderTeam();});
+function renderAgenda(){
+ const root=$('agenda-list');root.replaceChildren();
+ $('agenda-heading').textContent='Aktiviteter · '+day(chosenDate).toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'short'});
+ const matches=visibleAppointments().filter(x=>x.date===chosenDate).sort((a,b)=>a.start.localeCompare(b.start)||people.indexOf(a.person)-people.indexOf(b.person));
+ const summary=document.createElement('p');summary.className='note';const exits=matches.filter(x=>x.kind==='Utskolning').length;summary.textContent=matches.length+' aktiviteter · '+new Set(matches.map(x=>x.person)).size+' medarbetare med bokningar'+(exits?' · '+exits+' utskolning'+(exits===1?'':'ar'):'');root.append(summary);
+ if(!matches.length){const p=document.createElement('p');p.className='note';p.textContent='Inga inlagda testaktiviteter denna dag. Tryck på Nytt möte för att planera.';root.append(p);}
+ for(const x of matches){
+  const row=document.createElement('div');row.className='agenda-row';row.style.borderLeftColor=colored(x.person);
+  const line=document.createElement('div');line.className='agenda-description';
+  const t=document.createElement('strong');t.textContent=x.start+'–'+x.end+' · '+x.kind;
+  const sub=document.createElement('div');sub.className='note';sub.textContent=x.person+(x.student?' · '+x.student:'')+(x.note?' · '+x.note:'');
+  line.append(t,sub);
+  const actions=document.createElement('div');actions.className='agenda-actions';
+  const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Ändra';edit.addEventListener('click',()=>openAppointment(x));if(x.id.startsWith('demo-example-')){edit.disabled=true;edit.title='Förifyllt exempel kan inte ändras';}
+  const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Ta bort';del.setAttribute('aria-label','Ta bort '+x.kind+' för '+x.person+' '+x.start);del.addEventListener('click',()=>{if(x.id.startsWith('demo-example-'))return;if(!confirm('Ta bort testaktiviteten?'))return;appointments=appointments.filter(a=>a.id!==x.id);storeAppointments();renderHorizon();renderAgenda();renderHomeMeetings();renderTeam();});
+  if(!x.id.startsWith('demo-example-'))actions.append(edit,del);row.append(line,actions);root.append(row);
+ }
+ const unavailable=document.createElement('div');unavailable.className='availability-summary';
+ const head=document.createElement('h3');head.textContent='Teamets bokningar idag';unavailable.append(head);
+ people.forEach(p=>{const row=document.createElement('div');row.className='availability-person';const dot=document.createElement('i');dot.style.background=colored(p);const name=document.createElement('strong');name.textContent=p;const events=matches.filter(x=>x.person===p),state=document.createElement('span');state.textContent=events.length?events.length+' bokning'+(events.length===1?'':'ar'):'Inga bokningar';row.append(dot,name,state);unavailable.append(row);});
+ const note=document.createElement('p');note.className='note';note.textContent='Inga bokningar betyder inte automatiskt att personen är på plats. Här visas endast inlagda testaktiviteter.';unavailable.append(note);root.append(unavailable);
+}
+function renderPlan(){renderHorizon();renderAgenda();}
+function renderHorizon(){
+ const count=Number($('horizon-select').value),start=add(weekStart(new Date()),-7),root=$('horizon-list');
+ root.replaceChildren();
+ for(let i=0;i<count;i++){
+  const first=add(start,i*7),last=add(first,6),th=add(first,3),isoStart=weekStart(new Date(th.getFullYear(),0,4));
+  const week=Math.round((Dashboard.dayNumber(th)-Dashboard.dayNumber(isoStart))/7)+1;
+  const card=document.createElement('div');card.className='week-card';
+  const h=document.createElement('h3');h.textContent='Vecka '+week+' · '+first.toLocaleDateString('sv-SE',{day:'numeric',month:'short'})+'–'+last.toLocaleDateString('sv-SE',{day:'numeric',month:'short'});card.append(h);
+  const grid=document.createElement('div');grid.className='compact-week';
+  for(let d=0;d<7;d++){
+   const date=add(first,d),dt=key(date),btn=document.createElement('button');btn.type='button';btn.className='calendar-day'+(dt===chosenDate?' chosen':'');
+   const name=document.createElement('span');name.textContent=['M','T','O','T','F','L','S'][d];
+   const num=document.createElement('strong');num.textContent=String(date.getDate());
+   btn.append(name,num);
+   const daily=visibleAppointments().filter(x=>x.date===dt).sort((a,b)=>a.start.localeCompare(b.start));
+   for(const entry of daily.slice(0,3)){
+    const label=document.createElement('span');label.className='calendar-meeting'+(entry.kind==='Utskolning'?' exit-meeting':'');label.style.borderLeftColor=colored(entry.person);
+    label.textContent=entry.start+' '+(entry.kind==='Utskolning'?'UTSKOLNING':'')+(entry.kind==='Utskolning'&&entry.student?' · '+entry.student:entry.kind==='Utskolning'?'':' '+entry.kind);label.title=entry.person+' · '+entry.start+'–'+entry.end+' · '+entry.kind+(entry.student?' · '+entry.student:'');
+    btn.append(label);
+   }
+   if(daily.length>3){const more=document.createElement('span');more.className='calendar-more';more.textContent='+'+(daily.length-3)+' möten';btn.append(more);}
+   if(!daily.length){const free=document.createElement('span');free.className='calendar-empty';free.textContent='Inga bokningar';btn.append(free);}
+   btn.setAttribute('aria-label',date.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'})+', '+daily.length+' bokningar');
+   btn.addEventListener('click',()=>{chosenDate=dt;renderHorizon();renderAgenda();$('agenda-heading').scrollIntoView({behavior:'smooth',block:'start'});});
+   grid.append(btn);
+  }
+  card.append(grid);root.append(card);
+ }
+}
+function renderTeam(){
+ const root=$('team-list');root.replaceChildren();
+ people.forEach(p=>{
+  const entries=visibleAppointments().filter(x=>x.person===p&&x.date===today&&x.kind!=='På plats').map(x=>({start:x.start,end:x.end,kind:x.kind,student:x.student}));
+  slots.forEach(slot=>{
+   const kind=planning[p+'|'+today+'|'+slot];
+   if(options.includes(kind)&&kind!=='På plats'){
+    const [start,end]=slot.split('–').map(hour=>hour.padStart(2,'0')+':00');
+    entries.push({start,end,kind});
+   }
+  });
+  if(!entries.length)return;
+  entries.sort((a,b)=>a.start.localeCompare(b.start)||a.end.localeCompare(b.end));
+  const head=document.createElement('h3');head.style.fontSize='15px';head.style.borderLeft='3px solid '+colored(p);head.style.paddingLeft='8px';head.textContent=p;root.append(head);
+  entries.forEach(entry=>{
+   const row=document.createElement('div');row.className='slot-row';
+   const time=document.createElement('strong');time.textContent=entry.start+'–'+entry.end;time.style.whiteSpace='nowrap';
+   const label=document.createElement('span');label.className='status';label.textContent=entry.kind+(entry.student?' · '+entry.student:'');
+   row.append(time,label);root.append(row);
+  });
+ });
+ if(!root.children.length){const empty=document.createElement('p');empty.className='note';empty.textContent='Inga möten eller andra avvikande aktiviteter idag.';root.append(empty);}
+}
+$('horizon-select').addEventListener('change',renderHorizon);
+renderStudents();renderHomeMeetings();
+fetch('menu.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Saknas');return r.json()}).then(data=>{const meal=(data.meals||[]).find(m=>m.date?.slice(0,10)===today);$('menu-today').textContent=meal?.dishes?.length?meal.dishes.join(' · '):'Ingen aktuell matsedel';$('menu-detail').textContent=meal?'Gånghesterskolan':'Dagens lunch är inte publicerad';}).catch(()=>$('menu-today').textContent='Matsedeln är inte tillgänglig');
+fetch('https://api.open-meteo.com/v1/forecast?latitude=57.7210&longitude=12.9401&current=temperature_2m,weather_code&timezone=Europe%2FStockholm').then(r=>{if(!r.ok)throw Error('Saknas');return r.json()}).then(j=>{const c=j.current;if(typeof c?.temperature_2m!=='number')throw Error('Saknas');$('weather-temp').textContent=Math.round(c.temperature_2m)+'°';$('weather-text').textContent='Aktuell temperatur i Borås';}).catch(()=>$('weather-text').textContent='Vädret är inte tillgängligt');
+})();
+</script></body></html>

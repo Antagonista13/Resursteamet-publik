@@ -1,0 +1,439 @@
+"""Browser checks against the real static site; only external data is synthetic."""
+import datetime as dt
+import functools
+import http.server
+import json
+import os
+import shutil
+from pathlib import Path
+import threading
+import unittest
+from playwright.sync_api import sync_playwright
+
+ROOT = Path(__file__).resolve().parents[1]
+LEGACY = 'resursteamet_public_calendar_v1'
+DEMO = 'resursteamet_demo_calendar_v1'
+EVENT = {'id': 'import-1', 'date': '2026-10-29', 'time': '11:00', 'source': 'team', 'title': 'Importerat testmöte'}
+
+
+class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+
+class DashboardTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        handler = functools.partial(QuietHandler, directory=str(ROOT))
+        cls.server = http.server.ThreadingHTTPServer(('127.0.0.1', 0), handler)
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+        cls.playwright = sync_playwright().start()
+        cls.browser = cls.playwright.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'), args=['--no-sandbox'])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+        cls.playwright.stop()
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join()
+
+    def setUp(self):
+        self.context = self.browser.new_context(viewport={'width':1440, 'height':900}, timezone_id='Europe/Stockholm', accept_downloads=True)
+        self.page = self.context.new_page()
+        self.page.set_default_timeout(1500)
+        self.errors = []
+        self.page.on('pageerror', lambda e:self.errors.append(str(e)))
+        self.page.on('dialog', lambda d:d.accept())
+        self.page.clock.install(time=dt.datetime(2026, 10, 29, 8, tzinfo=dt.timezone.utc))
+        self.page.route('https://**/*', lambda r:r.fulfill(status=200, content_type='application/json', body=json.dumps({'current': {'temperature_2m': 10, 'wind_speed_10m': 4, 'weather_code': 2}})))
+        self.page.route('**/menu.json*', lambda r:r.fulfill(status=200, content_type='application/json', body=json.dumps({'updatedAt':'2026-10-29T08:00:00Z','meals':[{'date':'2026-10-29','dishes':['Testrätt A']},{'date':'2026-10-30','dishes':['Testrätt B']}]})))
+
+    def tearDown(self):
+        self.context.close()
+
+    def open(self):
+        self.page.goto(f'http://127.0.0.1:{self.server.server_port}/')
+        self.page.wait_for_load_state('networkidle')
+
+    def upload(self, events):
+        payload = {'format':'resursteamet-calendar', 'version':1, 'events':events}
+        self.page.locator('#import-events').set_input_files({'name':'test.json','mimeType':'application/json','buffer':json.dumps(payload).encode()})
+
+    def edit_mode(self):
+        self.page.locator('#edit-mode').click()
+
+    def test_desktop_dashboard_week_default(self):
+        self.open()
+        self.assertTrue(self.page.locator('body').evaluate("e=>e.classList.contains('dashboard-view')"))
+        self.assertEqual(self.page.locator('#week-grid .day').count(), 7)
+        self.assertFalse(self.page.locator('#entry-form').is_visible())
+        self.assertIn('ej anslutet', self.page.locator('#connection-status').inner_text())
+        self.assertEqual(self.errors, [])
+
+    def test_mobile_day_and_readable_seven_day_week(self):
+        self.page.set_viewport_size({'width':390,'height':844})
+        self.open()
+        self.assertFalse(self.page.locator('#week-panel').is_visible())
+        self.page.locator('#week-view').click()
+        self.assertTrue(self.page.locator('#week-panel').is_visible())
+        self.assertEqual(self.page.locator('#week-grid .day').count(),7)
+        self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+
+    def test_both_calendar_filters_affect_day_and_week(self):
+        self.open()
+        self.assertGreaterEqual(self.page.locator('#today-events .activity').count(),2)
+        self.page.locator('#filter-work').uncheck()
+        self.assertEqual(self.page.locator('#today-events .activity:not(.team)').count(),0)
+        self.assertGreater(self.page.locator('#week-grid .week-event.team').count(),0)
+        self.page.locator('#filter-team').uncheck()
+        self.assertEqual(self.page.locator('#week-grid .week-event').count(),0)
+        self.page.locator('#filter-work').check()
+        self.assertGreater(self.page.locator('#week-grid .week-event:not(.team)').count(),0)
+
+    def test_selected_day_survives_modes_and_dst_navigation(self):
+        self.open()
+        self.page.locator('#calendar-date').fill('2026-10-25')
+        self.page.locator('#day-view').click()
+        self.page.locator('#nav-next').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2026-10-26')
+        self.page.locator('#week-view').click()
+        self.page.locator('#nav-prev').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2026-10-19')
+        self.page.locator('#display-mode').click()
+        self.page.locator('#dashboard-mode').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2026-10-19')
+        self.page.locator('#nav-today').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2026-10-29')
+
+    def test_legacy_storage_is_not_read_or_overwritten_on_reset(self):
+        self.open()
+        original=json.dumps([{'id':'old','date':'2026-10-29','time':'08:00','source':'work','title':'LEGACY SHOULD NOT LOAD'}])
+        self.page.evaluate('(raw)=>localStorage.setItem("resursteamet_public_calendar_v1",raw)',original)
+        self.page.reload();self.page.wait_for_load_state('networkidle')
+        self.assertNotIn('LEGACY SHOULD NOT LOAD',self.page.locator('#today-events').inner_text())
+        self.edit_mode()
+        with self.page.expect_event('load'):
+            self.page.locator('#reset-demo').click()
+        self.page.wait_for_load_state('networkidle')
+        self.assertEqual(self.page.evaluate(f'localStorage.getItem({json.dumps(LEGACY)})'),original)
+
+    def test_calendar_crud_export_and_import(self):
+        self.open(); self.edit_mode()
+        self.page.locator('#entry-date').fill('2026-10-29')
+        self.page.locator('#entry-time').fill('12:00')
+        self.page.locator('#entry-title').fill('Nytt testmöte')
+        self.page.locator('#save-event').click()
+        event=self.page.locator('#today-events .activity').filter(has_text='Nytt testmöte')
+        self.assertEqual(event.count(),1)
+        event.get_by_role('button',name='Redigera').click()
+        self.page.locator('#entry-title').fill('Ändrat testmöte')
+        self.page.locator('#save-event').click()
+        self.assertIn('Ändrat testmöte',self.page.locator('#today-events').inner_text())
+        with self.page.expect_download() as downloaded:
+            self.page.locator('#export-events').click()
+        exported=json.loads(Path(downloaded.value.path()).read_text())
+        self.assertEqual(exported['format'],'resursteamet-calendar')
+        self.assertTrue(any(x['title']=='Ändrat testmöte' for x in exported['events']))
+        self.upload([EVENT])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('lästes in')")
+        self.assertIn('Importerat testmöte',self.page.locator('#today-events').inner_text())
+        self.page.locator('#week-grid .week-event').filter(has_text='Ändrat testmöte').get_by_role('button',name='Ta bort',exact=False).click()
+        self.assertNotIn('Ändrat testmöte',self.page.locator('#today-events').inner_text())
+        self.assertEqual(self.errors,[])
+
+    def test_invalid_imports_preserve_calendar(self):
+        self.open(); self.edit_mode()
+        before=self.page.locator('#today-events').inner_text()
+        for overrides in ({'date':'2026-02-30'},{'time':'25:00'},{'id':''},{'id':'   '}):
+            with self.subTest(overrides=overrides):
+                self.upload([{**EVENT,**overrides}])
+                self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('ogiltiga')")
+                self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+        self.upload([EVENT,EVENT])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('duplicerade')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+
+    def test_tampered_storage_is_rejected(self):
+        self.page.add_init_script("localStorage.setItem('resursteamet_demo_calendar_v1',JSON.stringify([{id:'bad',date:'2026-02-30',time:'25:00',source:'team',title:'BROKEN'}]));")
+        self.open()
+        self.assertNotIn('BROKEN',self.page.locator('#week-grid').inner_text())
+        self.assertIn('ogiltig',self.page.locator('#demo-feedback').inner_text())
+
+    def test_five_staff_follow_selected_date_and_reset_on_reload(self):
+        self.open()
+        self.assertEqual(self.page.locator('.staff-person').count(),5)
+        self.assertEqual(self.page.locator('#staff-planning select').count(),100)
+        self.page.locator('#day-view').click()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),20)
+        status=self.page.get_by_label('Medarbetare A, 2026-10-29, 08–10',exact=True)
+        second=self.page.get_by_label('Medarbetare A, 2026-10-29, 10–12',exact=True)
+        self.assertEqual(status.input_value(),'På plats')
+        status.select_option('Handledning')
+        self.assertEqual(second.input_value(),'På plats')
+        self.page.locator('#nav-next').click()
+        self.assertEqual(self.page.get_by_label('Medarbetare A, 2026-10-30, 08–10',exact=True).input_value(),'På plats')
+        self.page.locator('#nav-prev').click()
+        self.assertEqual(status.input_value(),'Handledning')
+        self.page.reload(); self.page.locator('#day-view').click()
+        self.assertEqual(status.input_value(),'På plats')
+        self.page.locator('#display-mode').click()
+        self.assertFalse(self.page.locator('#staff-planning').is_visible())
+
+    def test_case_status_is_editable_but_not_persisted(self):
+        self.open(); self.edit_mode()
+        first=self.page.locator('#pending-list .pending-item').first
+        first.get_by_label('Status för Skola A',exact=True).select_option('Klar för start')
+        self.assertIn('Klar för start',first.locator('.pending-status').inner_text())
+        self.page.reload()
+        self.assertEqual(self.page.get_by_label('Status för Skola A',exact=True).input_value(),'Ny förfrågan')
+
+    def test_placement_dates_and_fictional_codes(self):
+        self.open(); self.edit_mode()
+        self.assertIn('Elev A',self.page.locator('#placement-list').inner_text())
+        self.assertNotIn('Slutdatum passerat',self.page.locator('#placement-list').inner_text())
+        self.page.locator('#placement-code').fill('Test C')
+        self.page.locator('#placement-start').fill('2026-11-03')
+        self.page.locator('#placement-end').fill('2026-11-02')
+        self.page.locator('#placement-form button').click()
+        self.assertIn('Slutdatum måste',self.page.locator('#placement-feedback').inner_text())
+        self.page.locator('#placement-end').fill('2026-11-06')
+        self.page.locator('#placement-form button').click()
+        self.assertEqual(self.page.locator('.placement-item').filter(has_text='Test C').count(),1)
+        self.page.locator('.placement-item').filter(has_text='Test C').get_by_role('button').click()
+        self.assertEqual(self.page.locator('.placement-item').filter(has_text='Test C').count(),0)
+
+    def test_configured_test_break_boundaries(self):
+        config={'version':1,'demo':True,'breaks':[{'name':'Exempellov','start':'2026-11-02','end':'2026-11-06'}]}
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=200,content_type='application/json',body=json.dumps(config)))
+        self.open()
+        self.assertIn('4 kalenderdagar',self.page.locator('#break-count').inner_text())
+        self.assertIn('TEST',self.page.locator('#break').inner_text())
+        for date,wanted in [(dt.datetime(2026,11,2,8,tzinfo=dt.timezone.utc),'pågår'),(dt.datetime(2026,11,6,8,tzinfo=dt.timezone.utc),'pågår'),(dt.datetime(2026,11,7,8,tzinfo=dt.timezone.utc),'Inget kommande testlov')]:
+            with self.subTest(date=date):
+                self.page.clock.set_system_time(date)
+                self.page.reload();self.page.wait_for_load_state('networkidle')
+                self.assertIn(wanted,self.page.locator('#break-count').inner_text())
+
+    def test_invalid_break_config_is_not_presented_as_verified_dates(self):
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=200,content_type='application/json',body=json.dumps({'version':1,'demo':True,'breaks':[{'name':'Bad','start':'2026-02-30','end':'2026-03-01'}]})))
+        self.open()
+        self.assertIn('kunde inte läsas',self.page.locator('#break-count').inner_text())
+        self.assertNotIn('Höstlov',self.page.locator('#break').inner_text())
+
+    def test_external_failures_and_stale_menu_are_honest(self):
+        self.page.route('https://**/*',lambda r:r.abort())
+        self.page.route('**/menu.json*',lambda r:r.fulfill(status=200,content_type='application/json',body='{"meals":[{"date":"2026-10-12","dishes":["GAMMAL RÄTT"]}]}'))
+        self.open()
+        self.assertIn('otillgängligt',self.page.locator('#weather').inner_text())
+        self.assertNotIn('GAMMAL RÄTT',self.page.locator('#meal-content').inner_text())
+        self.assertIn('Ingen meny',self.page.locator('#meal-content').inner_text())
+        self.assertEqual(self.errors,[])
+
+    def test_tv_load_paging_and_return_to_dashboard(self):
+        self.open(); self.edit_mode()
+        self.page.locator('#stress-enable').click()
+        self.page.locator('#display-mode').click()
+        self.page.clock.fast_forward(1600)
+        self.assertEqual(self.page.locator('#week-grid .day').count(),5)
+        self.assertEqual(self.page.locator('#pending-list .pending-item:visible').count(),4)
+        self.assertEqual(self.page.locator('#placement-list .placement-item:visible').count(),4)
+        for selector,panel in [('#pending-list .pending-item:visible','.pending-panel'),('#placement-list .placement-item:visible','.placement-panel')]:
+            bottom=self.page.locator(panel).bounding_box()
+            for card in self.page.locator(selector).all():
+                box=card.bounding_box()
+                self.assertLessEqual(box['y']+box['height'],bottom['y']+bottom['height'])
+        first=self.page.locator('#pending-list').inner_text()
+        self.page.clock.fast_forward(12000)
+        self.assertNotEqual(self.page.locator('#pending-list').inner_text(),first)
+        self.page.locator('#dashboard-mode').click()
+        self.assertEqual(self.page.locator('#pending-list .pending-item:visible').count(),8)
+        self.assertEqual(self.page.locator('#placement-list .placement-item:visible').count(),8)
+        self.edit_mode();self.page.locator('#stress-disable').click()
+        self.assertEqual(self.page.locator('#pending-list .pending-item').count(),2)
+
+    def test_viewports_and_modes_have_no_horizontal_overflow_or_clipped_tv_cards(self):
+        self.open()
+        for width,height in [(390,844),(1440,900),(1920,1080)]:
+            self.page.set_viewport_size({'width':width,'height':height})
+            for mode in ['dashboard','edit','display']:
+                with self.subTest(viewport=(width,height),mode=mode):
+                    self.page.locator('#'+mode+'-mode').click()
+                    self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+                    if mode=='display' and width>=1000:
+                        for panel in ['.pending-panel','.placement-panel']:
+                            box=self.page.locator(panel).bounding_box()
+                            self.assertLessEqual(box['y']+box['height'],height)
+                            self.assertGreater(box['height'],100)
+        self.assertEqual(self.errors,[])
+
+    def test_imported_text_cannot_create_html_and_keyboard_controls_work(self):
+        self.open();self.edit_mode()
+        attack='<img src=x onerror="window.injection=true">'
+        self.upload([{**EVENT,'title':attack}])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('lästes in')")
+        self.assertIn(attack,self.page.locator('#today-events').inner_text())
+        self.assertEqual(self.page.locator('#today-events img').count(),0)
+        self.assertFalse(self.page.evaluate('Boolean(window.injection)'))
+        self.page.get_by_role('button',name='Dashboard',exact=True).focus()
+        self.page.keyboard.press('Enter')
+        self.assertFalse(self.page.locator('#entry-form').is_visible())
+        self.page.get_by_role('button',name='Dag',exact=True).focus()
+        self.page.keyboard.press('Enter')
+        self.assertFalse(self.page.locator('#week-panel').is_visible())
+
+    def test_import_limits_and_failed_storage_leave_calendar_unchanged(self):
+        self.open();self.edit_mode()
+        before=self.page.locator('#today-events').inner_text()
+        self.upload([{**EVENT,'id':f'limit-{i}'} for i in range(501)])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('ogiltiga')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+        self.page.locator('#import-events').set_input_files({'name':'oversized.json','mimeType':'application/json','buffer':b'x'*(1024*1024+1)})
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('stor')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+        self.page.evaluate("() => {Storage.prototype.setItem=function(){throw new DOMException('full','QuotaExceededError')}}")
+        self.upload([EVENT])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('gick inte att spara')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+
+    def test_year_boundary_and_filters_survive_mode_changes(self):
+        self.open()
+        self.page.locator('#calendar-date').fill('2026-12-31')
+        self.page.locator('#day-view').click()
+        self.page.locator('#filter-team').uncheck()
+        self.page.locator('#nav-next').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2027-01-01')
+        self.page.locator('#display-mode').click();self.page.locator('#dashboard-mode').click()
+        self.assertFalse(self.page.locator('#filter-team').is_checked())
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2027-01-01')
+
+    def test_menu_next_day_and_weekend_selection(self):
+        self.open()
+        self.assertIn('Testrätt A',self.page.locator('#meal-content').inner_text())
+        self.page.clock.set_system_time(dt.datetime(2026,10,29,13,tzinfo=dt.timezone.utc))
+        self.page.reload();self.page.wait_for_load_state('networkidle')
+        self.assertIn('Testrätt B',self.page.locator('#meal-content').inner_text())
+        self.page.clock.set_system_time(dt.datetime(2026,10,31,8,tzinfo=dt.timezone.utc))
+        self.page.reload();self.page.wait_for_load_state('networkidle')
+        self.assertIn('måndag',self.page.locator('#meal-date').inner_text())
+        self.assertNotIn('Testrätt A',self.page.locator('#meal-content').inner_text())
+
+    def test_menu_and_config_http_failures_end_in_fallback(self):
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=503,body='unavailable'))
+        self.page.route('**/menu.json*',lambda r:r.fulfill(status=503,body='unavailable'))
+        self.open()
+        self.assertIn('kunde inte läsas',self.page.locator('#break-count').inner_text())
+        self.assertIn('Ingen meny',self.page.locator('#meal-content').inner_text())
+        self.assertEqual(self.errors,[])
+
+    def test_hanging_weather_request_times_out(self):
+        pending=[]
+        self.page.route('https://**/*',lambda r:pending.append(r))
+        self.page.goto(f'http://127.0.0.1:{self.server.server_port}/',wait_until='domcontentloaded')
+        self.page.wait_for_function("document.querySelector('#weather').textContent.includes('otillgängligt')",timeout=15000)
+        self.assertNotIn('Hämtar',self.page.locator('#weather').inner_text())
+        for route in pending:
+            route.abort()
+        self.assertEqual(self.errors,[])
+
+    def test_maximum_length_unbroken_case_name_wraps_on_mobile(self):
+        self.open();self.edit_mode()
+        self.page.locator('#pending-school').fill('X'*48)
+        self.page.locator('#pending-form button').click()
+        self.page.set_viewport_size({'width':390,'height':844})
+        self.assertEqual(self.page.locator('.pending-item').filter(has_text='X'*48).count(),1)
+        self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+        self.page.locator('#dashboard-mode').click()
+        self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+
+    def test_hanging_menu_and_config_requests_time_out(self):
+        pending=[]
+        for pattern in ['**/menu.json*','**/demo-config.json']:
+            self.page.route(pattern,lambda r:pending.append(r))
+        self.page.goto(f'http://127.0.0.1:{self.server.server_port}/',wait_until='domcontentloaded')
+        self.page.wait_for_function("document.querySelector('#break-count').textContent.includes('kunde inte läsas')",timeout=15000)
+        self.page.wait_for_function("document.querySelector('#meal-content').textContent.includes('Ingen meny')",timeout=15000)
+        for route in pending:
+            route.abort()
+        self.assertEqual(self.errors,[])
+
+    def test_four_staff_slots_and_all_activity_options_are_independent(self):
+        self.open();self.page.locator('#day-view').click()
+        activities=['På plats','Inledande möte','Pedagogiskt möte','Uppföljningsmöte','Avslutande möte','Utskolning','Observation','Handledning','Privat','Annat','Frånvarande']
+        slots=['08–10','10–12','12–14','14–16']
+        expected={}
+        for person_index,person in enumerate('ABCDE'):
+            row=self.page.locator('.staff-person').filter(has=self.page.get_by_role('heading',name='Medarbetare '+person,exact=True))
+            self.assertEqual(row.locator('select').count(),4)
+            for slot_index,slot in enumerate(slots):
+                label=f'Medarbetare {person}, 2026-10-29, {slot}'
+                control=self.page.get_by_label(label,exact=True)
+                self.assertEqual(control.locator('option').evaluate_all('(options)=>options.map(o=>o.value)'),activities)
+                self.assertEqual(control.input_value(),'På plats')
+                value=activities[(person_index*4+slot_index)%len(activities)]
+                control.select_option(value);expected[label]=value
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.locator('#week-view').click()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),100)
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.locator('#day-view').click()
+        self.page.locator('#nav-next').click()
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+        self.page.locator('#nav-prev').click()
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.reload();self.page.locator('#day-view').click()
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+        self.assertEqual(self.errors,[])
+
+    def test_staff_activity_keyboard_focus_survives_minute_refresh(self):
+        self.open();self.page.locator('#day-view').click()
+        control=self.page.get_by_label('Medarbetare E, 2026-10-29, 14–16',exact=True)
+        control.select_option('Pedagogiskt möte')
+        control.focus()
+        self.page.clock.fast_forward(60001)
+        self.assertTrue(control.evaluate('(el)=>el===document.activeElement'))
+        self.assertEqual(control.input_value(),'Pedagogiskt möte')
+        self.page.keyboard.press('Tab')
+        self.assertFalse(control.evaluate('(el)=>el===document.activeElement'))
+
+    def test_staff_weekend_default_does_not_leak_to_weekdays(self):
+        self.open();self.page.locator('#day-view').click()
+        self.page.locator('#calendar-date').fill('2026-10-31')
+        self.page.locator('#nav-next').focus()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),20)
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'Frånvarande')
+        self.page.locator('#week-view').click()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),100)
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+
+    def test_four_staff_slots_fit_mobile_desktop_and_full_hd(self):
+        self.open()
+        for width,height in [(390,844),(1440,900),(1920,1080)]:
+            self.page.set_viewport_size({'width':width,'height':height})
+            for view,number in [('day',20),('week',100)]:
+                with self.subTest(viewport=(width,height),view=view):
+                    self.page.locator('#'+view+'-view').click()
+                    self.assertEqual(self.page.locator('#staff-planning select').count(),number)
+                    for control in self.page.locator('#staff-planning select').all():
+                        control.select_option('Uppföljningsmöte')
+                    outside=self.page.locator('.staff-person').evaluate_all('''rows=>rows.flatMap(row=>{
+                      const box=row.getBoundingClientRect();
+                      return [...row.querySelectorAll('select')].filter(input=>{
+                        const r=input.getBoundingClientRect();
+                        return r.left<box.left-1||r.right>box.right+1||r.top<box.top-1||r.bottom>box.bottom+1;
+                      }).map(input=>input.getAttribute('aria-label'));
+                    })''')
+                    self.assertEqual(outside,[])
+                    self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+            self.page.locator('#display-mode').click()
+            self.assertFalse(self.page.locator('#staff-planning').is_visible())
+            self.page.locator('#dashboard-mode').click()
+        self.assertEqual(self.errors,[])
