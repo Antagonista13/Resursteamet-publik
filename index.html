@@ -190,7 +190,11 @@
 <div><button type="button" id="nav-prev" aria-label="Föregående period">‹</button><button type="button" id="nav-today">Idag</button><button type="button" id="nav-next" aria-label="Nästa period">›</button></div>
 <fieldset><legend>Visa kalendrar</legend><label><input id="filter-work" type="checkbox" checked>Min kalender (blå)</label><label><input id="filter-team" type="checkbox" checked>Resursteamet (grön)</label></fieldset>
 </nav><div class="calendar-layout"><section class="card"><h2 id="day-heading">DAGENS AKTIVITETER</h2><div class="muted" id="today-label"></div><div id="today-events" style="margin-top:14px" aria-live="polite"></div></section><section class="card" id="week-panel"><div class="week-head"><h2 style="margin:0">VECKOKALENDER</h2><div class="tv-only"><button id="prev-week" aria-label="Föregående vecka">‹</button> <strong id="week-range" style="font-size:13px"></strong> <button id="next-week" aria-label="Nästa vecka">›</button> <button id="current-week">Idag</button></div></div><div class="week-grid" id="week-grid"></div></section></div>
-<section class="card staff-panel dashboard-only"><h2>PERSONALPLANERING · TESTDATA</h2><p class="muted">Fem påhittade medarbetare med fyra tidspass per vardag (08–10, 10–12, 12–14, 14–16). På plats är standard. Valen är enbart testdata och återställs vid omladdning.</p><div id="staff-planning"></div></section><div class="workload-row"><section class="card pending-panel"><div class="week-head"><h2 style="margin:0">VÄNTANDE UPPDRAG <span class="muted">· DEMO</span></h2><span class="muted" id="pending-count"></span></div><div class="small-note">Endast testuppgifter – skriv inte in riktiga skolor, elevuppgifter eller ärenden här. Uppgifter i demon sparas inte.</div><div id="pending-list" class="pending-list"></div></section>
+<section class="card horizon-panel dashboard-only" aria-label="Planering fyra till sex veckor">
+ <div class="horizon-top"><div><h2>PLANERINGSÖVERSIKT · TESTDATA</h2><p class="muted">Föregående vecka, denna vecka och kommande veckor. Endast påhittade kalenderaktiviteter.</p></div>
+ <div class="horizon-actions"><label for="horizon-length">Visa <select id="horizon-length"><option value="4">4 veckor</option><option value="5">5 veckor</option><option value="6" selected>6 veckor</option></select></label><button type="button" id="horizon-add">+ Ny testaktivitet</button></div></div>
+ <div id="horizon-weeks" class="horizon-grid" aria-live="polite"></div>
+</section><section class="card staff-panel dashboard-only"><h2>PERSONALPLANERING · TESTDATA</h2><p class="muted">Fem påhittade medarbetare med fyra tidspass per vardag (08–10, 10–12, 12–14, 14–16). På plats är standard. Valen är enbart testdata och återställs vid omladdning.</p><div id="staff-planning"></div></section><div class="workload-row"><section class="card pending-panel"><div class="week-head"><h2 style="margin:0">VÄNTANDE UPPDRAG <span class="muted">· DEMO</span></h2><span class="muted" id="pending-count"></span></div><div class="small-note">Endast testuppgifter – skriv inte in riktiga skolor, elevuppgifter eller ärenden här. Uppgifter i demon sparas inte.</div><div id="pending-list" class="pending-list"></div></section>
 <section class="card placement-panel"><div class="week-head"><h2 style="margin:0">PLACERINGAR & UTSKOLNING <span class="muted">· DEMO</span></h2><span id="placement-count" class="muted"></span></div><div class="small-note">Påhittade exempel. Nedräkning till angivet slutdatum i kalenderdagar – inte en automatisk juridisk bedömning.</div><div class="placement-list" id="placement-list"></div></section></div>
 <section class="card editor-only stress-panel"><h2>TESTDATA & BELASTNINGSTEST</h2><button type="button" id="reset-demo">Återställ testdata</button><p class="small-note">Lägg till påhittade testposter för att se hur 40-tums-TV:n hanterar 6 möten, 8 väntande uppdrag och 8 placeringar. Testet sparar inga uppgifter och ändrar inte dina riktiga kalenderaktiviteter.</p><div class="pills"><button type="button" id="stress-enable">Starta belastningstest</button><button type="button" id="stress-disable" disabled>Stäng av testet</button><span class="muted" id="stress-status" role="status">Testet är avstängt.</span></div></section><section class="card editor-only placement-editor"><h2>REGISTRERA TESTPLACERING</h2><p class="small-note">Använd bara fiktiva koder. Informationen sparas inte och försvinner när sidan laddas om.</p><form id="placement-form" class="placement-form"><label>Exempelkod<input id="placement-code" required maxlength="12" placeholder="Elev A"></label><label>Startdatum<input id="placement-start" type="date" required></label><label>Beslutat slutdatum<input id="placement-end" type="date" required></label><label>Fas<select id="placement-phase"><option value="Pågående">Pågående</option><option value="Utskolning">Utskolning</option></select></label><button type="submit">Lägg till testplacering</button></form><div class="muted" id="placement-feedback" role="status"></div></section><section class="card editor-only demo-initials-editor"><h2>VECKANS ELEVKODER · DEMO</h2><p class="small-note">Använd endast påhittade bokstavskoder här. Den offentliga demonstrationen lagrar inga verkliga elevscheman. Ändringarna gäller bara tills sidan laddas om.</p><div class="demo-initials-grid" id="demo-initials-form"></div><button type="button" id="reset-demo-initials">Återställ exempel</button></section><section class="card editor-only pending-editor"><h2>REGISTRERA TESTUPPDRAG</h2><form id="pending-form" class="pending-form"><label>Skola (fiktiv)<input id="pending-school" required maxlength="48" placeholder="Exempel: Skola A"></label><label>Preliminär start<input id="pending-start" type="date"></label><label>Status<select id="pending-status"><option>Ny förfrågan</option><option>Inväntar beslut</option><option>Under planering</option><option>Klar för start</option></select></label><button type="submit">Lägg till testuppdrag</button></form><div class="muted" id="pending-feedback" role="status"></div></section><section class="card editor-only" style="margin-top:14px"><h2 id="form-heading">LÄGG TILL AKTIVITET</h2><div class="small-note">Endast icke-känslig information. Använd endast påhittade testaktiviteter. Testaktiviteterna lagras i denna webbläsare på den här datorn, inte i GitHub eller Outlook. De är synliga och redigerbara för den som använder datorn och kan försvinna om webbläsardata rensas.</div><form id="entry-form" class="entry-form"><label>Datum<input id="entry-date" type="date" required></label><label>Tid<input id="entry-time" type="time" required></label><label>Kalender<select id="entry-source"><option value="work">Min kalender (blå)</option><option value="team">Resursteamet (grön)</option></select></label><label class="wide">Aktivitet<input id="entry-title" type="text" maxlength="90" placeholder="T.ex. Arbetsplatsträff" required></label><button type="submit" id="save-event">Lägg till</button><button type="button" id="cancel-edit" hidden>Avbryt redigering</button></form><div class="muted" id="save-feedback" role="status" style="margin-top:9px"></div></section><section class="card editor-only" style="margin-top:14px"><h2>SÄKERHETSKOPIA AV KALENDERN</h2><p class="muted">Spara en kopia som en JSON-fil på datorn. Filen innehåller aktiviteternas datum, tid och text och ska hanteras varsamt. Använd bara icke-känsliga aktiviteter. Import lägger till aktiviteter som saknas och ersätter inte befintliga.</p><div class="pills"><button id="export-events" type="button">Spara säkerhetskopia</button><label class="backup-label">Läs in säkerhetskopia <input type="file" id="import-events" accept=".json,application/json" aria-label="Välj säkerhetskopia i JSON-format"></label></div><div class="muted" id="backup-feedback" role="status" style="margin-top:10px"></div></section><div class="grid footer-grid editor-only"><section class="card"><h2>ANSLUTNINGAR</h2><p class="muted">Outlook är inte anslutet. Endast icke-känsliga aktiviteter som läggs in här visas i kalendern.</p></section><section class="card"><h2>SNABBLÄNKAR</h2><a class="link" href="https://outlook.boras.se/owa/" target="_blank" rel="noopener noreferrer">Öppna Outlook</a></section></div><p class="muted editor-only">Resursteamet · Kalenderaktiviteter lagras endast i den här webbläsaren.</p>
 </main><script src="dashboard.js"></script><script>
@@ -232,6 +236,56 @@ function startEditing(e){editingId=e.id;document.getElementById('entry-date').va
 function stopEditing(){editingId=null;document.getElementById('form-heading').textContent='LÄGG TILL AKTIVITET';document.getElementById('save-event').textContent='Lägg till';document.getElementById('cancel-edit').hidden=true;document.getElementById('entry-form').reset();document.getElementById('entry-date').value=dateKey(new Date());}
 document.getElementById('cancel-edit').addEventListener('click',stopEditing);
 let stressEvents=[];const sorted=()=>events.concat(stressEvents).filter(e=>sourceFilters[e.source]).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+function renderHorizon(){
+ const root=document.getElementById('horizon-weeks');
+ if(!root)return;
+ const count=Number(document.getElementById('horizon-length').value);
+ const weekStart=Dashboard.addDays(monday(new Date()),-7);
+ const available=sorted();
+ const fragment=document.createDocumentFragment();
+ for(let w=0;w<count;w++){
+  const first=Dashboard.addDays(weekStart,w*7),last=Dashboard.addDays(first,6);
+  const card=document.createElement('section');card.className='horizon-week'+(w===1?' horizon-current':'');
+  const title=document.createElement('h3');
+  const weekNumber=Math.floor((Date.UTC(first.getFullYear(),first.getMonth(),first.getDate())-Date.UTC(first.getFullYear(),0,1))/86400000/7)+1;
+  // ISO week is determined by the Thursday in the same calendar week.
+  const thursday=Dashboard.addDays(first,3);
+  const jan4=new Date(thursday.getFullYear(),0,4);
+  const isoMonday=monday(jan4);
+  const isoWeek=Math.round((Dashboard.dayNumber(thursday)-Dashboard.dayNumber(isoMonday))/7)+1;
+  title.textContent='Vecka '+isoWeek+(w===1?' · Nu':'');
+  const range=document.createElement('p');range.className='muted';range.textContent=first.toLocaleDateString('sv-SE',{day:'numeric',month:'short'})+' – '+last.toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
+  card.append(title,range);
+  let found=0;
+  for(let d=0;d<7;d++){
+   const day=Dashboard.addDays(first,d),key=dateKey(day);
+   const items=available.filter(e=>e.date===key);
+   if(!items.length)continue;
+   const group=document.createElement('div');group.className='horizon-day';
+   const heading=document.createElement('strong');heading.textContent=day.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric'});
+   group.append(heading);
+   for(const e of items){
+    const line=document.createElement('div');line.className='horizon-event '+(e.source==='team'?'team':'work');
+    line.textContent=e.time+' '+e.title;group.append(line);found++;
+   }
+   card.append(group);
+  }
+  if(!found){const empty=document.createElement('p');empty.className='muted';empty.textContent='Inga testaktiviteter';card.append(empty);}
+  const add=document.createElement('button');add.type='button';add.className='horizon-day-add';add.textContent='+ Planera denna vecka';
+  add.addEventListener('click',()=>openHorizonEditor(first));
+  card.append(add);fragment.append(card);
+ }
+ root.replaceChildren(fragment);
+}
+function openHorizonEditor(date){
+ document.getElementById('edit-mode').click();
+ document.getElementById('entry-date').value=dateKey(date);
+ document.getElementById('entry-form').scrollIntoView({behavior:'smooth',block:'start'});
+ document.getElementById('entry-title').focus();
+}
+document.getElementById('horizon-length').addEventListener('change',renderHorizon);
+document.getElementById('horizon-add').addEventListener('click',()=>openHorizonEditor(new Date()));
+
 function renderCalendar(){
  const now=new Date(),today=dateKey(now),start=monday(selectedDate),selected=dateKey(selectedDate);
  const isTV=document.body.classList.contains('display-view');
@@ -245,6 +299,7 @@ function renderCalendar(){
  const todays=sorted().filter(e=>e.date===selected);if(!todays.length){const p=document.createElement('p');p.className='muted';p.textContent='Inga testaktiviteter för vald dag och valda kalendrar.';todayBox.append(p);}
  for(const e of todays){const item=document.createElement('div');item.className='activity '+(e.source==='team'?'team':'');const line=document.createElement('div');const time=document.createElement('span');time.className='event-time';time.textContent=e.time;const title=document.createElement('span');title.textContent=e.title;line.append(time,title);const sub=document.createElement('div');sub.className='muted';sub.textContent=e.source==='team'?'Resursteamet':'Min kalender';item.append(line,sub);const edit=document.createElement('button');edit.type='button';edit.className='tiny editor-action';edit.style.marginTop='7px';edit.textContent='Redigera';edit.addEventListener('click',()=>startEditing(e));if(!e.demoStress)item.append(edit);todayBox.append(item);}
  Dashboard.renderStaff(document.getElementById('staff-planning'),selectedDate,calendarView);
+ if(!isTV)renderHorizon();
  const end=new Date(start);end.setDate(end.getDate()+6);document.getElementById('week-range').textContent=dayFormat(start)+' – '+dayFormat(end);
  const grid=document.getElementById('week-grid');grid.replaceChildren();for(let i=0;i<(document.body.classList.contains('display-view')?5:7);i++){const d=new Date(start);d.setDate(d.getDate()+i);const key=dateKey(d);const cell=document.createElement('div');cell.className='day'+(key===today?' today':'');const head=document.createElement('div');head.className='day-title';head.textContent=dayFormat(d);cell.append(head);const initial=document.createElement('div');initial.className='day-initials'+(demoInitials[i]?'':' day-initials-empty');initial.textContent=demoInitials[i]||'–';initial.title='Påhittade elevkoder – demo';cell.append(initial);const found=sorted().filter(e=>e.date===key);for(const e of found){const pill=document.createElement('div');pill.className='week-event '+(e.source==='team'?'team':'');const title=document.createElement('div');title.textContent=e.time+' '+e.title;const source=document.createElement('div');source.className='muted';source.textContent=e.source==='team'?'Resursteamet':'Min kalender';title.append(source);const actions=document.createElement('div');actions.className='event-actions';const del=document.createElement('button');del.type='button';del.className='tiny editor-action';del.textContent='Ta bort';del.setAttribute('aria-label','Ta bort '+e.title);del.addEventListener('click',()=>{if(!confirm('Ta bort aktiviteten?'))return;events=events.filter(x=>x.id!==e.id);if(editingId===e.id)stopEditing();save();});const edit=document.createElement('button');edit.type='button';edit.className='tiny editor-action';edit.textContent='Redigera';edit.addEventListener('click',()=>startEditing(e));if(!e.demoStress)actions.append(edit,del);pill.append(title,actions);cell.append(pill);}grid.append(cell);}
 }
