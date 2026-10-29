@@ -12,9 +12,10 @@ async function main(){
  const html=fs.readFileSync('mobil.html','utf8'),nodes=new Map();
  for(const [,id] of html.matchAll(/id="([^"]+)"/g))nodes.set(id,new Element());
  nodes.get('horizon-select').value='6';
- const document={getElementById:id=>nodes.get(id)||null,createElement:tag=>new Element(tag),createTextNode:text=>({textContent:text}),querySelectorAll:()=>[]};
+ const tabs=['idag','planering','teamet','kontakter','mer'].map(name=>{const el=new Element('button');el.dataset.tab=name;return el;});
+ const document={getElementById:id=>nodes.get(id)||null,createElement:tag=>new Element(tag),createTextNode:text=>({textContent:text}),querySelectorAll:selector=>selector==='[data-tab]'?tabs:selector==='.screen'?[...nodes.entries()].filter(([id])=>id.startsWith('screen-')).map(([id,el])=>{el.id=id;return el;}):[]};
  const fetches=[];
- const context=vm.createContext({document,window:{scrollTo(){}},sessionStorage:{getItem(){return null},setItem(){}},console,fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url==='menu.json'?{meals:[]}:{current:{temperature_2m:8}}}}});
+ const context=vm.createContext({document,window:{scrollTo(){}},confirm:()=>true,sessionStorage:{getItem(){return null},setItem(){}},console,fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url==='menu.json'?{meals:[]}:{current:{temperature_2m:8}}}}});
  vm.runInContext(fs.readFileSync('dashboard.js','utf8'),context);
  context.Dashboard=context.window.Dashboard;
  const inline=html.match(/<script>\s*([\s\S]*?)<\/script>/)[1];
@@ -31,6 +32,23 @@ async function main(){
  assert.equal(fetches.length,2);
  assert.equal(nodes.get('weather-temp').textContent,'8°');
  assert.equal(nodes.get('menu-today').textContent,'Ingen aktuell matsedel');
- console.log('PASS: complete mobile startup, '+meetings.length+' meetings (six daily examples plus calendar entries), pupil link, four staff slots, ten pupils, weather and lunch requests');
+ tabs.find(x=>x.dataset.tab==='planering').listeners.click();
+ const agenda=nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row');
+ assert.equal(agenda.length,meetings.length,'home and calendar must contain the same daily meetings');
+ for(let i=0;i<meetings.length;i++){
+  assert.ok(agenda[i].children[0].children[0].textContent.startsWith(meetings[i].children[0].textContent));
+  assert.equal(agenda[i].style.borderLeftColor,meetings[i].style.borderLeftColor);
+ }
+ nodes.get('new-appointment').listeners.click();
+ nodes.get('appt-note').value='Testbokning';
+ nodes.get('appointment-form').listeners.submit({preventDefault(){}});
+ assert.equal(nodes.get('home-meetings').children.length,meetings.length+1);
+ const added=nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row');
+ assert.equal(added.length,meetings.length+1);
+ const custom=added.find(row=>row.children[0].children[1].textContent.includes('Testbokning'));
+ custom.children[1].children[1].listeners.click();
+ assert.equal(nodes.get('home-meetings').children.length,meetings.length);
+ assert.equal(nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row').length,meetings.length);
+ console.log('PASS: mobile startup, '+meetings.length+' shared meetings, matching calendar order/colors, pupil link, add/delete updates both views, weather and lunch requests');
 }
 main().catch(e=>{console.error(e);process.exit(1)});
