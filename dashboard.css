@@ -49,3 +49,5 @@ body:not(.display-view) .week-head .tv-only{display:none}
 .staff-slots select,.pending-item select{display:block;width:100%;margin-top:5px;min-height:44px;padding:8px;color:#fff;background:#192c3b;border:1px solid #738798;border-radius:7px;font:inherit}
 .pending-item label{display:block;font-size:12px;margin-bottom:8px}
 @media(max-width:680px){.staff-slots{grid-template-columns:1fr}}
+/* Accepted test-school names may contain no spaces; keep them inside the card. */
+.pending-item{overflow-wrap:anywhere}

@@ -108,12 +108,16 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(self.page.locator('#calendar-date').input_value(),'2026-10-29')
 
     def test_legacy_storage_is_not_read_or_overwritten_on_reset(self):
-        self.page.add_init_script("localStorage.setItem('resursteamet_public_calendar_v1',JSON.stringify([{id:'old',date:'2026-10-29',time:'08:00',source:'work',title:'LEGACY SHOULD NOT LOAD'}]));")
         self.open()
+        original=json.dumps([{'id':'old','date':'2026-10-29','time':'08:00','source':'work','title':'LEGACY SHOULD NOT LOAD'}])
+        self.page.evaluate('(raw)=>localStorage.setItem("resursteamet_public_calendar_v1",raw)',original)
+        self.page.reload();self.page.wait_for_load_state('networkidle')
         self.assertNotIn('LEGACY SHOULD NOT LOAD',self.page.locator('#today-events').inner_text())
         self.edit_mode()
-        self.page.locator('#reset-demo').click()
-        self.assertIn('LEGACY SHOULD NOT LOAD',self.page.evaluate(f'localStorage.getItem({json.dumps(LEGACY)})'))
+        with self.page.expect_event('load'):
+            self.page.locator('#reset-demo').click()
+        self.page.wait_for_load_state('networkidle')
+        self.assertEqual(self.page.evaluate(f'localStorage.getItem({json.dumps(LEGACY)})'),original)
 
     def test_calendar_crud_export_and_import(self):
         self.open(); self.edit_mode()
@@ -232,6 +236,11 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(self.page.locator('#week-grid .day').count(),5)
         self.assertEqual(self.page.locator('#pending-list .pending-item:visible').count(),4)
         self.assertEqual(self.page.locator('#placement-list .placement-item:visible').count(),4)
+        for selector,panel in [('#pending-list .pending-item:visible','.pending-panel'),('#placement-list .placement-item:visible','.placement-panel')]:
+            bottom=self.page.locator(panel).bounding_box()
+            for card in self.page.locator(selector).all():
+                box=card.bounding_box()
+                self.assertLessEqual(box['y']+box['height'],bottom['y']+bottom['height'])
         first=self.page.locator('#pending-list').inner_text()
         self.page.clock.fast_forward(12000)
         self.assertNotEqual(self.page.locator('#pending-list').inner_text(),first)
@@ -321,6 +330,27 @@ class DashboardTests(unittest.TestCase):
         self.page.goto(f'http://127.0.0.1:{self.server.server_port}/',wait_until='domcontentloaded')
         self.page.wait_for_function("document.querySelector('#weather').textContent.includes('otillgängligt')",timeout=15000)
         self.assertNotIn('Hämtar',self.page.locator('#weather').inner_text())
+        for route in pending:
+            route.abort()
+        self.assertEqual(self.errors,[])
+
+    def test_maximum_length_unbroken_case_name_wraps_on_mobile(self):
+        self.open();self.edit_mode()
+        self.page.locator('#pending-school').fill('X'*48)
+        self.page.locator('#pending-form button').click()
+        self.page.set_viewport_size({'width':390,'height':844})
+        self.assertEqual(self.page.locator('.pending-item').filter(has_text='X'*48).count(),1)
+        self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+        self.page.locator('#dashboard-mode').click()
+        self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+
+    def test_hanging_menu_and_config_requests_time_out(self):
+        pending=[]
+        for pattern in ['**/menu.json*','**/demo-config.json']:
+            self.page.route(pattern,lambda r:pending.append(r))
+        self.page.goto(f'http://127.0.0.1:{self.server.server_port}/',wait_until='domcontentloaded')
+        self.page.wait_for_function("document.querySelector('#break-count').textContent.includes('kunde inte läsas')",timeout=15000)
+        self.page.wait_for_function("document.querySelector('#meal-content').textContent.includes('Ingen meny')",timeout=15000)
         for route in pending:
             route.abort()
         self.assertEqual(self.errors,[])

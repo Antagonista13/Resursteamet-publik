@@ -59,8 +59,8 @@
 
 **Files:** Extend tests/test_dashboard.py; create README.md and docs/validation-2026-10-29.md; update design approval state.
 **Interfaces:** Test commands remain `python3 -m unittest discover -s tests -v`; browser tests use installed Chromium and Playwright, external calls are synthetic.
-- [ ] Add regression coverage for keyboard labels, text injection, TV load paging and return to dashboard, all viewport/mode combinations and no cropped bottom cards.
-- [ ] Run failures before any associated corrections; fix and rerun only affected tests.
-- [ ] Run full suite, JavaScript syntax, git diff --check. Record actual counts and limits, no invented SharePoint/Outlook tests.
-- [ ] Commit; obtain one independent whole-branch review, address important findings with failing regression tests first.
+- [x] Add regression coverage for keyboard labels, text injection, TV load paging and return to dashboard, all viewport/mode combinations and no cropped bottom cards.
+- [x] Run failures before any associated corrections; fix and rerun only affected tests.
+- [x] Run full suite, JavaScript syntax, git diff --check. Record actual counts and limits, no invented SharePoint/Outlook tests.
+- [x] Commit; obtain one independent whole-branch review, address important findings with failing regression tests first.
 - [ ] Push only development branch; recheck API access and create PR if possible. If API is still blocked, keep exact PR title/body locally and report blocker without changing production network configuration.

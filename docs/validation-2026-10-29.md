@@ -4,9 +4,9 @@ Utvecklingsgren: `utveckling/dashboard-demo-2026-10-29`. Designen godkändes i c
 
 ## Genomförda kontroller
 
-`python3 -m unittest discover -s tests -v`: **28 tester passerade**, inga överhoppade. Python 3.12.14, Playwright 1.62.0, Chromium.
+`python3 -m unittest discover -s tests -v`: **30 tester passerade**, inga överhoppade. Python 3.12.14, Playwright 1.62.0, Chromium.
 
-- 22 webbläsartester kör den riktiga sidan på en tillfällig HTTP-server med syntetiska externa svar och påhittade aktiviteter.
+- 24 webbläsartester kör den riktiga sidan på en tillfällig HTTP-server med syntetiska externa svar och påhittade aktiviteter.
 - 6 Python-integrationstester kör matsedelsskriptet med temporära filer och ersatt nätverksgräns.
 - Både `dashboard.js` och de inline-script som finns i `index.html` klarar `node --check`.
 - `git diff --check` passerar.
@@ -27,3 +27,11 @@ Endast Chromium har automatiserats; Safari, Firefox, riktiga telefoner och fysis
 ## Leverans
 
 Utvecklingsgrenen ska granskas genom pull request. Ingen merge, deploy, ändring av miljökonfiguration eller körning av schemalagt produktionsworkflow har gjorts. GitHubs API var blockerat av proxy vid inventeringen; aktuell PR-status redovisas i chatten efter leveransförsöket.
+
+## Oberoende kodgranskning
+
+En separat granskare gick igenom hela ändringen mot den godkända designen. Ett mobilfel reproducerades: ett tillåtet 48-teckens skolnamn utan mellanslag gjorde sidan bredare än skärmen. Regressionstestet misslyckades före rättningen och passerade efter att uppdragskort fick radbrytning. Hela sviten passerade därefter med 30 tester.
+
+Återställningstestet sätter nu tidigare kalenderlagring en enda gång och kontrollerar exakt samma värde efter omladdning. TV-belastningstestet kontrollerar även synliga korts nedre gräns. Hängande väder-, meny- och lovkonfigurationsanrop har egna timeoutkontroller.
+
+Granskningen verifierar inte liveintegrationer, produktionsdrift, officiella lovdatum, fysisk TV eller andra webbläsare. Femdagars TV och personalplanering i minnet följer den godkända designen. Inga övriga produktändringar eller uppskjutna kodfel identifierades i granskningen.
