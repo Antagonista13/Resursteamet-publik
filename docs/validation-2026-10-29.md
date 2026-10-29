@@ -35,3 +35,5 @@ En separat granskare gick igenom hela ändringen mot den godkända designen. Ett
 Återställningstestet sätter nu tidigare kalenderlagring en enda gång och kontrollerar exakt samma värde efter omladdning. TV-belastningstestet kontrollerar även synliga korts nedre gräns. Hängande väder-, meny- och lovkonfigurationsanrop har egna timeoutkontroller.
 
 Granskningen verifierar inte liveintegrationer, produktionsdrift, officiella lovdatum, fysisk TV eller andra webbläsare. Femdagars TV och personalplanering i minnet följer den godkända designen. Inga övriga produktändringar eller uppskjutna kodfel identifierades i granskningen.
+
+Utvecklingsgrenen är pushad. Försöket att skapa en draft-PR med `gh pr create` blockerades: `Post https://api.github.com/graphql: Forbidden`. Ingen PR skapades. Färdig PR-text finns i [pull-request.md](pull-request.md). Remote main har verifierats ligga kvar på inventeringens bascommit.
