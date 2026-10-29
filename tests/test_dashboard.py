@@ -4,6 +4,7 @@ import functools
 import http.server
 import json
 import os
+import shutil
 from pathlib import Path
 import threading
 import unittest
@@ -28,7 +29,7 @@ class DashboardTests(unittest.TestCase):
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls.playwright = sync_playwright().start()
-        cls.browser = cls.playwright.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox'])
+        cls.browser = cls.playwright.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'), args=['--no-sandbox'])
 
     @classmethod
     def tearDownClass(cls):
@@ -221,4 +222,105 @@ class DashboardTests(unittest.TestCase):
         self.assertIn('otillgängligt',self.page.locator('#weather').inner_text())
         self.assertNotIn('GAMMAL RÄTT',self.page.locator('#meal-content').inner_text())
         self.assertIn('Ingen meny',self.page.locator('#meal-content').inner_text())
+        self.assertEqual(self.errors,[])
+
+    def test_tv_load_paging_and_return_to_dashboard(self):
+        self.open(); self.edit_mode()
+        self.page.locator('#stress-enable').click()
+        self.page.locator('#display-mode').click()
+        self.page.clock.fast_forward(1600)
+        self.assertEqual(self.page.locator('#week-grid .day').count(),5)
+        self.assertEqual(self.page.locator('#pending-list .pending-item:visible').count(),4)
+        self.assertEqual(self.page.locator('#placement-list .placement-item:visible').count(),4)
+        first=self.page.locator('#pending-list').inner_text()
+        self.page.clock.fast_forward(12000)
+        self.assertNotEqual(self.page.locator('#pending-list').inner_text(),first)
+        self.page.locator('#dashboard-mode').click()
+        self.assertEqual(self.page.locator('#pending-list .pending-item:visible').count(),8)
+        self.assertEqual(self.page.locator('#placement-list .placement-item:visible').count(),8)
+        self.edit_mode();self.page.locator('#stress-disable').click()
+        self.assertEqual(self.page.locator('#pending-list .pending-item').count(),2)
+
+    def test_viewports_and_modes_have_no_horizontal_overflow_or_clipped_tv_cards(self):
+        self.open()
+        for width,height in [(390,844),(1440,900),(1920,1080)]:
+            self.page.set_viewport_size({'width':width,'height':height})
+            for mode in ['dashboard','edit','display']:
+                with self.subTest(viewport=(width,height),mode=mode):
+                    self.page.locator('#'+mode+'-mode').click()
+                    self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+                    if mode=='display' and width>=1000:
+                        for panel in ['.pending-panel','.placement-panel']:
+                            box=self.page.locator(panel).bounding_box()
+                            self.assertLessEqual(box['y']+box['height'],height)
+                            self.assertGreater(box['height'],100)
+        self.assertEqual(self.errors,[])
+
+    def test_imported_text_cannot_create_html_and_keyboard_controls_work(self):
+        self.open();self.edit_mode()
+        attack='<img src=x onerror="window.injection=true">'
+        self.upload([{**EVENT,'title':attack}])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('lästes in')")
+        self.assertIn(attack,self.page.locator('#today-events').inner_text())
+        self.assertEqual(self.page.locator('#today-events img').count(),0)
+        self.assertFalse(self.page.evaluate('Boolean(window.injection)'))
+        self.page.get_by_role('button',name='Dashboard',exact=True).focus()
+        self.page.keyboard.press('Enter')
+        self.assertFalse(self.page.locator('#entry-form').is_visible())
+        self.page.get_by_role('button',name='Dag',exact=True).focus()
+        self.page.keyboard.press('Enter')
+        self.assertFalse(self.page.locator('#week-panel').is_visible())
+
+    def test_import_limits_and_failed_storage_leave_calendar_unchanged(self):
+        self.open();self.edit_mode()
+        before=self.page.locator('#today-events').inner_text()
+        self.upload([{**EVENT,'id':f'limit-{i}'} for i in range(501)])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('ogiltiga')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+        self.page.locator('#import-events').set_input_files({'name':'oversized.json','mimeType':'application/json','buffer':b'x'*(1024*1024+1)})
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('stor')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+        self.page.evaluate("() => {Storage.prototype.setItem=function(){throw new DOMException('full','QuotaExceededError')}}")
+        self.upload([EVENT])
+        self.page.wait_for_function("document.querySelector('#backup-feedback').textContent.includes('gick inte att spara')")
+        self.assertEqual(self.page.locator('#today-events').inner_text(),before)
+
+    def test_year_boundary_and_filters_survive_mode_changes(self):
+        self.open()
+        self.page.locator('#calendar-date').fill('2026-12-31')
+        self.page.locator('#day-view').click()
+        self.page.locator('#filter-team').uncheck()
+        self.page.locator('#nav-next').click()
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2027-01-01')
+        self.page.locator('#display-mode').click();self.page.locator('#dashboard-mode').click()
+        self.assertFalse(self.page.locator('#filter-team').is_checked())
+        self.assertEqual(self.page.locator('#calendar-date').input_value(),'2027-01-01')
+
+    def test_menu_next_day_and_weekend_selection(self):
+        self.open()
+        self.assertIn('Testrätt A',self.page.locator('#meal-content').inner_text())
+        self.page.clock.set_system_time(dt.datetime(2026,10,29,13,tzinfo=dt.timezone.utc))
+        self.page.reload();self.page.wait_for_load_state('networkidle')
+        self.assertIn('Testrätt B',self.page.locator('#meal-content').inner_text())
+        self.page.clock.set_system_time(dt.datetime(2026,10,31,8,tzinfo=dt.timezone.utc))
+        self.page.reload();self.page.wait_for_load_state('networkidle')
+        self.assertIn('måndag',self.page.locator('#meal-date').inner_text())
+        self.assertNotIn('Testrätt A',self.page.locator('#meal-content').inner_text())
+
+    def test_menu_and_config_http_failures_end_in_fallback(self):
+        self.page.route('**/demo-config.json',lambda r:r.fulfill(status=503,body='unavailable'))
+        self.page.route('**/menu.json*',lambda r:r.fulfill(status=503,body='unavailable'))
+        self.open()
+        self.assertIn('kunde inte läsas',self.page.locator('#break-count').inner_text())
+        self.assertIn('Ingen meny',self.page.locator('#meal-content').inner_text())
+        self.assertEqual(self.errors,[])
+
+    def test_hanging_weather_request_times_out(self):
+        pending=[]
+        self.page.route('https://**/*',lambda r:pending.append(r))
+        self.page.goto(f'http://127.0.0.1:{self.server.server_port}/',wait_until='domcontentloaded')
+        self.page.wait_for_function("document.querySelector('#weather').textContent.includes('otillgängligt')",timeout=15000)
+        self.assertNotIn('Hämtar',self.page.locator('#weather').inner_text())
+        for route in pending:
+            route.abort()
         self.assertEqual(self.errors,[])

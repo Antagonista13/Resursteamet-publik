@@ -1,6 +1,6 @@
 # Resursteamet Dashboard Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Complete the approved test dashboard without replacing working TV, calendar or JSON behavior.
 
@@ -32,28 +32,28 @@
 
 **Files:** Modify scripts/update_menu.py; create tests/test_update_menu.py.
 **Interfaces:** Consumes synthetic Matilda payload; produces unchanged menu.json {updatedAt, source, meals:[{date,name,dishes}]}. Extract parse_menu(payload) and main() for importable testing.
-- [ ] Write failing tests for courses, legacy dishes, malformed date/empty dishes, no-overwrite on failure and network failure.
-- [ ] Run `python3 -m unittest discover -s tests -p test_update_menu.py -v`; confirm new-format failure.
-- [ ] Implement courses/legacy parsing, date validation, guarded main and atomic output after successful parsing.
-- [ ] Run same tests; expect all pass. Commit task.
+- [x] Write failing tests for courses, legacy dishes, malformed date/empty dishes, no-overwrite on failure and network failure.
+- [x] Run `python3 -m unittest discover -s tests -p test_update_menu.py -v`; confirm new-format failure.
+- [x] Implement courses/legacy parsing, date validation, guarded main and atomic output after successful parsing.
+- [x] Run same tests; expect all pass. Commit task.
 
 ### Task 2: Safe demo calendar and responsive modes
 
 **Files:** Modify index.html; create dashboard.js, dashboard.css, tests/test_dashboard.py.
 **Interfaces:** window.Dashboard exposes dateKey(Date), localDay(string), addDays(Date,number), dayNumber(Date), isEvent(object), readEvents(raw), seedEvents(Date), importEvents(parsed,existing). Existing event object and export schema unchanged. Selected date and calendar filters drive day/week/staff views.
-- [ ] Write failing Chromium tests for dashboard default, mobile day default, both filters, shared selected date and DST, legacy-storage isolation, valid CRUD/export/import and rejected malformed/duplicate imports.
-- [ ] Run `python3 -m unittest discover -s tests -p test_dashboard.py -v`; confirm missing-mode/storage/import failures.
-- [ ] Add helpers, scoped CSS and controls; adapt existing rendering and handlers without rewriting TV paging, cases or backup functions. Bound requests with abort/timeout. Demo reset writes only demo storage.
-- [ ] Run same tests; expect pass. Commit task.
+- [x] Write failing Chromium tests for dashboard default, mobile day default, both filters, shared selected date and DST, legacy-storage isolation, valid CRUD/export/import and rejected malformed/duplicate imports.
+- [x] Run `python3 -m unittest discover -s tests -p test_dashboard.py -v`; confirm missing-mode/storage/import failures.
+- [x] Add helpers, scoped CSS and controls; adapt existing rendering and handlers without rewriting TV paging, cases or backup functions. Bound requests with abort/timeout. Demo reset writes only demo storage.
+- [x] Run same tests; expect pass. Commit task.
 
 ### Task 3: Staff, cases and configurable test breaks
 
 **Files:** Modify index.html, dashboard.js, dashboard.css, tests/test_dashboard.py; create demo-config.json.
 **Interfaces:** Dashboard.renderStaff(root,selectedDate,view) shows five staff and updates in-memory assignments; Dashboard.renderBreak(config,now) selects validated demo periods. demo-config.json is version 1, demo true, breaks:[{name,start,end}].
-- [ ] Add failing tests for five staff, date-aware status retention and reload reset, case status update, placement validation, break before/during/after boundaries, bad config and weather/menu failures.
-- [ ] Run dashboard tests; confirm failures identify missing behavior.
-- [ ] Implement in-memory staff controls, relative fictional placement dates, case status select, synthetic configurable breaks and honest service states.
-- [ ] Run dashboard suite; expect pass. Commit task.
+- [x] Add failing tests for five staff, date-aware status retention and reload reset, case status update, placement validation, break before/during/after boundaries, bad config and weather/menu failures.
+- [x] Run dashboard tests; confirm failures identify missing behavior.
+- [x] Implement in-memory staff controls, relative fictional placement dates, case status select, synthetic configurable breaks and honest service states.
+- [x] Run dashboard suite; expect pass. Commit task.
 
 ### Task 4: Regression, documentation and delivery
 

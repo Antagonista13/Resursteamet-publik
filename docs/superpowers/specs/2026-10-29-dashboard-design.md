@@ -1,8 +1,8 @@
 # Designförslag: Resursteamet Dashboard
 
-Status: för granskning, inte godkänt eller implementerat.
+Status: godkänt av användaren i chatten 2026-10-29. Implementation på separat utvecklingsgren.
 Underlag: [projektinventeringen](../../inventering-2026-10-29.md).
-Användaren har begärt att få granska designen före implementation.
+Användaren granskade och godkände designen före implementation.
 
 ## Syfte och föreslagen väg
 
@@ -85,7 +85,7 @@ Ingen Graph-anrop eller Outlook-synkning ingår. MailboxNotEnabledForRESTAPI kva
 
 ## Kräver åtkomst eller beslut
 
-- Användarens godkännande av detta förslag före implementation.
+- Designen är godkänd; produktion och verkliga integrationer kräver fortfarande separat godkännande.
 - SharePoint: anonymiserat JSON-exempel eller läsbar länk och fältstruktur. Utveckling med lokala testdata kan fortsätta utan detta efter designgodkännande.
-- PR: åtkomst till api.github.com behöver fungera; nuvarande proxy blockerar. Befintlig token får inte antas sakna behörighet enbart på grund av detta. Git-pushbehörighet återstår att verifiera.
+- PR: åtkomst till api.github.com behöver fungera; nuvarande proxy blockerar. Befintlig token får inte antas sakna behörighet enbart på grund av detta. Git-push av utvecklingsgrenen har verifierats.
 - Officiella lovdatum, riktig personalplanering, delad lagring, åtkomstkontroll och Outlook/SharePoint-integration är senare beslut. Inga verkliga uppgifter ingår i denna etapp.
