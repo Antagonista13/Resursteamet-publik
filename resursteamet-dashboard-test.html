@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="sv"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#141d27"><title>FÖRHANDSGRANSKNING · Resursteamet · Testdata</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#101820,#243444);color:#f3f6fa;font-family:Segoe UI,Arial,sans-serif}main{max-width:1920px;padding:18px 24px;margin:auto}header{display:flex;justify-content:space-between;gap:15px;align-items:center}h1{font-size:28px;margin:0}h2{font-size:15px;margin:0 0 14px;letter-spacing:.4px}.muted{color:#b9c8d3;font-size:13px;line-height:1.5}.clock{font-size:28px;font-weight:800}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.card{background:#ffffff0e;border:1px solid #ffffff22;border-radius:16px;padding:16px}.notice{padding:14px;border-left:4px solid #e3bb75;background:#49382466;border-radius:8px;margin:20px 0;font-size:13px}.temp{font-size:42px;font-weight:750}.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}button{background:#293d50;color:white;border:1px solid #607b90;border-radius:9px;padding:10px 12px;cursor:pointer}button[aria-pressed=true]{background:#a9c8dd;color:#11202b;font-weight:800}.status{padding:13px;background:#1f3242;border-radius:9px;margin-top:14px;font-size:13px;color:#c6d3df}.legend{display:flex;flex-wrap:wrap;gap:15px;font-size:12px;color:#bdcdd7}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.link{display:inline-block;padding:10px 13px;margin:5px 5px 0 0;text-decoration:none;border-radius:9px;background:#314d64;color:white;font-size:13px}@media(max-width:680px){main{padding:14px}.grid{grid-template-columns:1fr}header{align-items:flex-start}}
+
+.calendar-layout{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(0,2.25fr);gap:14px;margin-top:14px}.activity{background:#263c4b;border-left:4px solid #79b4ee;border-radius:9px;padding:11px;margin-bottom:9px;overflow-wrap:anywhere}.activity.team{border-color:#72d399}.event-time{font-weight:750;margin-right:8px}.week-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:12px}.day{border:1px solid #ffffff20;border-radius:9px;padding:7px;min-height:210px;min-width:0;background:#1c2b38}.day.today{border-color:#e3bb75}.day-title{font-size:11px;font-weight:700;margin-bottom:10px}.week-event{font-size:11px;padding:6px;margin-bottom:5px;border-radius:5px;background:#314b64;border-left:3px solid #79b4ee;overflow-wrap:anywhere}.week-event.team{background:#284d43;border-left-color:#72d399}.event-actions{display:flex;gap:5px;margin-top:6px}.tiny{font-size:11px;padding:4px 7px}.entry-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:10px}.entry-form label{font-size:12px;color:#cbd6e0}.entry-form input,.entry-form select{width:100%;margin-top:4px;border-radius:7px;border:1px solid #738798;background:#192c3b;color:white;padding:9px}.entry-form .wide{grid-column:span 2}.entry-form button{align-self:end}.small-note{font-size:12px;color:#d9c39f}@media(max-width:950px){.calendar-layout{grid-template-columns:1fr}.week-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.entry-form{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.entry-form{grid-template-columns:1fr}.entry-form .wide{grid-column:span 1}}.summary-grid .card{min-height:115px}.summary-grid .temp{font-size:32px}.summary-grid p{margin:6px 0}.week-grid{width:100%}.calendar-layout>.card{min-width:0}.week-head>div{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.week-head button{padding:6px 10px}.entry-form{grid-template-columns:1fr 1fr 1fr 2fr auto;align-items:end}.entry-form .wide{grid-column:span 1}.entry-form button{min-height:39px}#cancel-edit{background:#485462}#cancel-edit[hidden]{display:none}.footer-grid{margin-top:12px}@media(min-width:951px) and (max-width:1200px){.week-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.day{padding:4px}.day-title{font-size:10px}}@media(max-width:950px){.entry-form{grid-template-columns:repeat(2,minmax(0,1fr))}.entry-form .wide{grid-column:span 2}}@media(max-width:560px){.entry-form{grid-template-columns:1fr}.entry-form .wide{grid-column:span 1}}.backup-label{display:inline-flex;align-items:center;gap:8px;background:#293d50;border:1px solid #607b90;border-radius:9px;padding:10px 12px;color:white;cursor:pointer;font-size:13px}.backup-label input{max-width:195px;font-size:12px}#backup-feedback{overflow-wrap:anywhere}.mode-controls{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}.mode-controls button[aria-pressed=true]{background:#a9c8dd;color:#11202b;font-weight:800}.lunch-card{margin-top:14px}.meal-content{font-size:18px;font-weight:650;line-height:1.5;margin:10px 0}.meal-content>div{margin:4px 0}.display-view .editor-only,.display-view .editor-action{display:none!important}.display-view .lunch-card{display:block}.display-view .card{padding:16px}.display-view .day{min-height:210px}@media(min-width:1050px){.display-view .summary-grid{grid-template-columns:1fr 1fr}.display-view .calendar-layout{grid-template-columns:minmax(280px,.75fr) minmax(0,2.25fr)}}@media(max-width:750px){header{flex-wrap:wrap}.mode-controls{order:3;width:100%}}
+/* Storbildsvy: kalendern prioriteras och övriga rutor hålls kompakta. */
+@media (min-width:1000px){
+ body.display-view main{height:100vh;min-height:600px;display:flex;flex-direction:column;padding:10px 18px;overflow:hidden}
+ body.display-view header{flex:0 0 auto;min-height:66px;gap:12px}
+ body.display-view header h1{font-size:25px;line-height:1.1}
+ body.display-view header .muted{font-size:12px}
+ body.display-view .clock{font-size:25px}
+ body.display-view .mode-controls button{padding:8px 11px;font-size:13px}
+ body.display-view .summary-grid{flex:0 0 auto;gap:10px;margin-top:8px;grid-template-columns:1fr 1fr}
+ body.display-view .summary-grid .card{min-height:0;padding:10px 14px}
+ body.display-view .summary-grid h2{margin:0 0 5px;font-size:13px}
+ body.display-view .summary-grid .temp{font-size:27px;line-height:1.15}
+ body.display-view .summary-grid #break{font-size:20px!important;line-height:1.2}
+ body.display-view .summary-grid .muted{font-size:12px}
+ body.display-view .summary-grid p{display:none}
+ body.display-view .lunch-card{flex:0 0 auto;margin-top:10px;padding:10px 14px;display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,2.2fr) auto;grid-template-rows:auto auto;column-gap:14px;align-items:center}
+ body.display-view .lunch-card h2{grid-column:1;grid-row:1;margin:0 0 4px;font-size:13px}
+ body.display-view .lunch-card #meal-date{grid-column:1;grid-row:2;font-size:12px}
+ body.display-view .lunch-card .meal-content{grid-column:2;grid-row:1/span 2;margin:0;font-size:16px;line-height:1.3}
+ body.display-view .lunch-card .meal-content>div{margin:2px 0}
+ body.display-view .lunch-card .link{grid-column:3;grid-row:1/span 2;padding:8px 10px;margin:0;font-size:12px;white-space:nowrap}
+ body.display-view .calendar-layout{flex:1 1 0;min-height:0;margin-top:10px;gap:10px;grid-template-columns:minmax(240px,30%) minmax(0,70%)}
+ body.display-view .calendar-layout>.card{min-height:0;padding:12px;overflow:auto}
+ body.display-view .calendar-layout h2{font-size:14px;margin-bottom:7px}
+ body.display-view #today-events{margin-top:8px!important}
+ body.display-view .activity{padding:9px;margin-bottom:7px;font-size:14px}
+ body.display-view .week-grid{height:calc(100% - 42px);min-height:0;margin-top:8px;align-items:stretch}
+ body.display-view .day{min-height:0;height:100%;padding:6px}
+ body.display-view .day-title{margin-bottom:6px;font-size:11px}
+ body.display-view .week-event{padding:5px;font-size:11px}
+ body.display-view .week-head{min-height:32px}
+ body.display-view .week-head button{padding:5px 8px}
+}
+@media (min-width:1000px) and (max-height:700px){
+ body.display-view header{min-height:53px}
+ body.display-view .summary-grid .card{padding:7px 12px}
+ body.display-view .lunch-card{padding:7px 12px}
+ body.display-view .calendar-layout{margin-top:7px}
+}
+
+.weather-primary{display:flex;gap:12px;align-items:center}#weather-icon{font-size:42px;line-height:1.1}.break-count{font-weight:750;font-size:18px;margin-top:5px;color:#e8d29f}
+@media(min-width:1000px){
+ body.display-view .top-overview{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(190px,1fr);gap:10px;margin-top:8px;flex:0 0 auto;align-items:stretch}
+ body.display-view .top-overview>.card{min-width:0;min-height:116px;margin:0;padding:12px 14px}
+ body.display-view .top-overview>.lunch-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px}
+ body.display-view .top-overview>.lunch-card h2{font-size:13px;margin:0}
+ body.display-view .top-overview>.lunch-card #meal-date{display:none}
+ body.display-view .top-overview>.lunch-card .meal-content{font-size:17px;line-height:1.25;margin:2px 0;max-width:100%}
+ body.display-view .top-overview>.lunch-card .link{display:none}
+ body.display-view .top-overview #weather-icon{font-size:43px}
+ body.display-view .top-overview .temp{font-size:38px}
+ body.display-view .top-overview #break{font-size:19px!important}
+ body.display-view .top-overview #breakdate{font-size:11px}
+ body.display-view .top-overview .break-count{font-size:17px}
+ body.display-view .calendar-layout{grid-template-columns:minmax(230px,28fr) minmax(0,72fr)}
+}
+@media(min-width:1000px) and (max-height:750px){
+ body.display-view .top-overview>.card{padding:9px 12px;min-height:98px}
+ body.display-view .top-overview #weather-icon{font-size:34px}
+ body.display-view .top-overview .temp{font-size:32px}
+ body.display-view .top-overview>.lunch-card .meal-content{font-size:15px}
+}
+@media(max-width:999px){.top-overview{grid-template-columns:1fr 1fr}.top-overview .lunch-card{grid-column:1/-1}}
+.pending-panel{margin-top:10px}.pending-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.pending-item{background:#1b2d3b;border-left:3px solid #e3bb75;border-radius:8px;padding:9px 11px;min-width:0}.pending-item strong{display:block;font-size:14px}.pending-item .muted{font-size:12px}.pending-form{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;align-items:end;gap:10px;margin-top:10px}.pending-form label{font-size:12px;color:#cbd6e0}.pending-form input,.pending-form select{display:block;margin-top:5px;padding:9px;width:100%;border-radius:7px;background:#192c3b;color:#fff;border:1px solid #738798}.pending-form button{min-height:39px}.pending-editor{margin-top:10px}@media(min-width:1000px){body.display-view .pending-panel{flex:0 0 auto;padding:10px 14px;margin-top:8px}body.display-view .pending-panel .small-note{display:none}body.display-view .pending-list{margin-top:6px}body.display-view .pending-item{padding:6px 9px}body.display-view .pending-item strong{font-size:12px}body.display-view .pending-item .muted{font-size:11px}}@media(max-width:850px){.pending-form{grid-template-columns:1fr 1fr}.pending-list{grid-template-columns:1fr 1fr}}@media(max-width:520px){.pending-form,.pending-list{grid-template-columns:1fr}}.day-initials{background:#294052;border-radius:6px;padding:6px 5px;margin:5px 0 9px;font-size:12px;font-weight:750;color:#e0effa;line-height:1.35;overflow-wrap:anywhere}.day-initials-empty{opacity:.55;font-weight:400}.demo-initials-editor{margin-top:10px}.demo-initials-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:10px 0}.demo-initials-grid label{font-size:12px;color:#cbd6e0}.demo-initials-grid input{width:100%;margin-top:5px;padding:10px;background:#192c3b;color:white;border:1px solid #738798;border-radius:8px}@media(max-width:800px){.demo-initials-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}.placement-panel{margin-top:9px}.placement-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}.placement-item{background:#203343;border-left:3px solid #79b4ee;padding:9px 10px;border-radius:8px;min-width:0}.placement-item.leaving{border-color:#d6a85a}.placement-item strong{font-size:13px;display:block}.placement-item .muted{font-size:11px}.placement-progress{height:5px;background:#455765;border-radius:6px;overflow:hidden;margin:8px 0 5px}.placement-progress span{display:block;height:100%;background:#72d399}.placement-item.leaving .placement-progress span{background:#d6a85a}.placement-editor{margin-top:10px}.placement-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:9px;align-items:end}.placement-form label{font-size:12px;color:#cbd6e0}.placement-form input,.placement-form select{width:100%;padding:9px;margin-top:5px;background:#192c3b;border:1px solid #738798;border-radius:7px;color:#fff}.placement-form button{min-height:39px}@media(min-width:1000px){body.display-view .placement-panel{flex:0 0 auto;margin-top:7px;padding:9px 13px}body.display-view .placement-panel .small-note{display:none}body.display-view .placement-list{margin-top:6px}body.display-view .placement-item{padding:7px 9px}}@media(max-width:850px){.placement-form{grid-template-columns:1fr 1fr}.placement-list{grid-template-columns:1fr 1fr}}@media(max-width:520px){.placement-form,.placement-list{grid-template-columns:1fr}}
+/* Full-HD TV: fem större dagkolumner och kompakt tvådelad uppdragsrad. */
+.workload-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;min-width:0}
+.workload-row>.card{margin-top:0;min-width:0}
+@media(min-width:1000px){
+ body.display-view main{height:100dvh;min-height:0;overflow:hidden;padding:8px 15px;gap:0}
+ body.display-view header{min-height:55px}
+ body.display-view .top-overview{margin-top:7px;gap:9px}
+ body.display-view .top-overview>.card{min-height:110px;padding:9px 13px}
+ body.display-view .top-overview .lunch-card .meal-content{font-size:17px}
+ body.display-view .calendar-layout{flex:1 1 0;min-height:225px;margin-top:9px;gap:9px;grid-template-columns:minmax(260px,27fr) minmax(0,73fr)}
+ body.display-view .calendar-layout>.card{overflow:hidden;padding:11px 12px}
+ body.display-view .calendar-layout>.card #today-events{max-height:calc(100% - 55px);overflow:hidden}
+ body.display-view .week-grid{grid-template-columns:repeat(5,minmax(0,1fr));height:calc(100% - 43px)}
+ body.display-view .day-title{font-size:13px}
+ body.display-view .day-initials{font-size:13px}
+ body.display-view .week-event{font-size:12px}
+ body.display-view .workload-row{flex:0 0 auto;height:169px;min-height:0;gap:9px;margin-top:9px}
+ body.display-view .workload-row>.card{height:100%;overflow:hidden;padding:10px 12px}
+ body.display-view .workload-row .pending-list,body.display-view .workload-row .placement-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:7px;max-height:117px;overflow:hidden}
+ body.display-view .workload-row .pending-item,body.display-view .workload-row .placement-item{padding:6px 8px}
+ body.display-view .workload-row .pending-item strong,body.display-view .workload-row .placement-item strong{font-size:13px}
+ body.display-view .workload-row .pending-item .muted,body.display-view .workload-row .placement-item .muted{font-size:11px}
+}
+@media(min-width:1000px) and (max-height:790px){
+ body.display-view header{min-height:48px}
+ body.display-view .top-overview>.card{min-height:90px;padding:8px 11px}
+ body.display-view .workload-row{height:137px}
+ body.display-view .workload-row .pending-list,body.display-view .workload-row .placement-list{max-height:92px}
+}
+@media(max-width:999px){.workload-row{grid-template-columns:1fr}}
+
+/* TV med hög belastning: kompakta kort, automatisk sidväxling utan intern scroll. */
+@media(min-width:1000px){
+ body.display-view header{min-height:47px}
+ body.display-view .top-overview>.card{min-height:0;padding:7px 11px}
+ body.display-view .top-overview{margin-top:5px}
+ body.display-view .top-overview h2{font-size:12px}
+ body.display-view .top-overview .temp{font-size:32px}
+ body.display-view .top-overview #weather-icon{font-size:33px}
+ body.display-view .top-overview .meal-content{font-size:15px!important;line-height:1.16!important}
+ body.display-view .top-overview .break-count{font-size:15px}
+ body.display-view .calendar-layout{margin-top:7px;min-height:200px}
+ body.display-view .calendar-layout>.card{padding:8px 10px}
+ body.display-view .calendar-layout h2{font-size:13px;margin-bottom:4px}
+ body.display-view .activity{padding:6px 8px;margin-bottom:5px;line-height:1.2}
+ body.display-view .activity .muted{font-size:11px}
+ body.display-view .day-initials{margin:4px 0 6px;padding:5px;font-size:12px}
+ body.display-view .week-event{padding:4px;margin-bottom:4px;line-height:1.2}
+ body.display-view .workload-row{height:155px;margin-top:7px}
+ body.display-view .workload-row>.card{padding:7px 10px}
+ body.display-view .workload-row .pending-list,body.display-view .workload-row .placement-list{max-height:none;overflow:hidden;margin-top:5px}
+ body.display-view .workload-row .pending-item,body.display-view .workload-row .placement-item{padding:5px 7px}
+ body.display-view .placement-progress{margin:4px 0 2px}
+ body.display-view .small-note{display:none}
+ body.display-view [data-tv-hidden="true"]{display:none!important}
+}
+.tv-pager{font-size:11px;color:#b9c8d3;white-space:nowrap;margin-left:8px}
+.stress-panel{margin-top:10px}.stress-panel button:disabled{opacity:.45;cursor:not-allowed}
+.rotation-indicator{display:none}
+@media(min-width:1000px){
+ body.display-view .top-overview{grid-template-columns:minmax(0,1.7fr) minmax(140px,.52fr) minmax(0,1.85fr) minmax(185px,.86fr)!important}
+ body.display-view .rotation-indicator{display:flex;align-items:center;justify-content:center;gap:9px;padding:8px!important}
+ body.display-view .rotation-indicator .hourglass{font-size:27px;line-height:1;animation:hourglass-spin 2.3s ease-in-out infinite}
+ body.display-view .rotation-copy{min-width:0;font-size:12px;line-height:1.25}
+ body.display-view .rotation-copy strong{font-size:10px;letter-spacing:.3px;display:block;margin-bottom:5px}
+ body.display-view #rotation-message{font-weight:700}
+ body.display-view .rotation-track{height:4px;border-radius:5px;background:#182735;overflow:hidden;margin-top:8px}
+ body.display-view #rotation-progress{display:block;height:100%;width:0;background:#a9c8dd}
+}
+@keyframes hourglass-spin{0%,42%{transform:rotate(0deg)}58%,100%{transform:rotate(180deg)}}
+@media(prefers-reduced-motion:reduce){.rotation-indicator .hourglass{animation:none!important}}
+
+/* Fullskärmsmarginal: undvik att nedersta raden kapas på Full HD-TV. */
+@media(min-width:1000px){
+ body.display-view main{box-sizing:border-box;height:100dvh;max-height:100dvh;padding:5px 12px 12px;overflow:hidden}
+ body.display-view header{min-height:42px}
+ body.display-view .top-overview{margin-top:4px;gap:7px}
+ body.display-view .top-overview>.card{padding:6px 10px;min-height:0}
+ body.display-view .calendar-layout{margin-top:6px;gap:7px;min-height:175px}
+ body.display-view .workload-row{height:154px;margin-top:6px;gap:7px;flex-shrink:0}
+ body.display-view .workload-row>.card{padding:7px 9px}
+}
+@media(min-width:1000px) and (max-height:850px){
+ body.display-view header{min-height:38px}
+ body.display-view .workload-row{height:142px}
+ body.display-view .calendar-layout{min-height:155px}
+}
+
+/* TV-vy: reservera faktisk höjd för sista raden i stället för flex-överflöd. */
+@media (min-width:1000px){
+ body.display-view main{
+   display:grid!important;
+   grid-template-rows:auto auto minmax(0,1fr) clamp(162px,22vh,216px);
+   row-gap:7px;
+   height:100dvh!important;
+   max-height:100dvh!important;
+   min-height:0!important;
+   padding:5px 12px 10px!important;
+   overflow:hidden;
+ }
+ body.display-view header{grid-row:1;min-height:0!important}
+ body.display-view .top-overview{grid-row:2;margin:0!important;min-height:0}
+ body.display-view .calendar-layout{grid-row:3;min-height:0!important;height:100%!important;margin:0!important}
+ body.display-view .workload-row{grid-row:4;height:100%!important;min-height:0!important;margin:0!important;align-self:stretch}
+ body.display-view .workload-row>.card{min-height:0!important;overflow:hidden}
+ body.display-view .workload-row .pending-list,
+ body.display-view .workload-row .placement-list{max-height:none!important;overflow:hidden}
+}
+
+/* Finjustering: lyft båda nedre informationsrutorna sex pixlar. */
+@media(min-width:1000px){
+ body.display-view .workload-row{transform:translateY(-6px)}
+}
+</style><style>/* Dashboard overrides are scoped so the existing TV layout stays intact. */
+[hidden]{display:none!important}
+body:not(.display-view) main{max-width:1500px}
+.dashboard-view .editor-only,.dashboard-view .editor-action{display:none!important}
+.display-view .dashboard-only{display:none!important}
+body:not(.display-view) .tv-only{display:none!important}
+.demo-banner{margin:14px 0;padding:12px 16px;border:1px solid #e3bb75;border-radius:10px;background:#49382466;line-height:1.5}
+.demo-banner strong{display:block;color:#f3dab0}
+.calendar-tools{margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.calendar-tools fieldset{display:flex;gap:12px;flex-wrap:wrap;border:1px solid #738798;border-radius:9px;margin:0;padding:8px 12px}
+.calendar-tools legend{font-size:12px;color:#b9c8d3}
+.calendar-tools label{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.calendar-tools input[type=date]{padding:9px;background:#192c3b;color:white;border:1px solid #738798;border-radius:7px;font:inherit;min-width:0}
+body:not(.display-view) button{min-height:44px}
+body:not(.display-view) .week-event{font-size:13px;line-height:1.45}
+body:not(.display-view) .day-title{font-size:13px}
+body:not(.display-view) .calendar-layout:has(#week-panel[hidden]){grid-template-columns:1fr}
+:focus-visible{outline:3px solid #f2cc77;outline-offset:3px}
+body:not(.display-view) .summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+body:not(.display-view) .summary-grid>.lunch-card{margin:0}
+body:not(.display-view) .week-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
+body:not(.display-view) .calendar-layout{grid-template-columns:minmax(240px,.7fr) minmax(0,2.3fr)}
+body:not(.display-view) .calendar-layout>.card{min-width:0}
+body:not(.display-view) .day{min-height:160px}
+body:not(.display-view) .week-head .tv-only{display:none}
+.mode-controls button{white-space:normal}
+@media(max-width:1100px){
+ body:not(.display-view) .calendar-layout{grid-template-columns:1fr}
+ body:not(.display-view) .week-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:680px){
+ body:not(.display-view) .summary-grid,body:not(.display-view) .week-grid{grid-template-columns:1fr}
+ body:not(.display-view) .summary-grid .lunch-card{grid-column:auto}
+ body:not(.display-view) .day{min-height:0}
+ .calendar-tools{align-items:stretch;flex-direction:column}
+ .calendar-tools>div{display:flex;flex-wrap:wrap;gap:6px}
+ .calendar-tools input[type=date]{max-width:100%}
+ .calendar-tools fieldset{justify-content:space-between}
+ .backup-label{flex-wrap:wrap;max-width:100%}
+ .backup-label input{max-width:100%}
+ header>div{min-width:0}
+ .clock{font-size:24px}
+}
+.staff-panel{margin-top:14px}
+.staff-person{margin-top:14px;border-top:1px solid #ffffff22;padding-top:12px}
+.staff-person h3{font-size:15px;margin:0 0 8px}
+.staff-slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.staff-slots label{font-size:13px;color:#b9c8d3}
+.staff-slots select,.pending-item select{display:block;width:100%;margin-top:5px;min-height:44px;padding:8px;color:#fff;background:#192c3b;border:1px solid #738798;border-radius:7px;font:inherit}
+.pending-item label{display:block;font-size:12px;margin-bottom:8px}
+@media(max-width:680px){.staff-slots{grid-template-columns:1fr}}
+/* Accepted test-school names may contain no spaces; keep them inside the card. */
+.pending-item{overflow-wrap:anywhere}
+</style></head><body class="dashboard-view"><main>
+<header><div><h1>RESURSTEAMET</h1><div class="muted">Arbetsrummets informationstavla</div></div><div class="mode-controls"><button type="button" id="dashboard-mode" aria-pressed="true">Dashboard</button><button type="button" id="display-mode" aria-pressed="false">Storbildsläge</button><button type="button" id="edit-mode" aria-pressed="false">Redigera testdata</button></div><div><div class="clock" id="clock">--:--</div><div id="date" class="muted"></div></div></header>
+<aside class="demo-banner dashboard-only"><strong>FÖRHANDSGRANSKNING · Endast testdata</strong><span id="connection-status">SharePoint: ej anslutet · Outlook: ej anslutet</span><div id="demo-feedback" role="status"></div></aside><div class="grid summary-grid top-overview"><section class="card"><h2>DAGENS VÄDER · BORÅS</h2><div class="weather-primary"><span id="weather-icon" role="img" aria-label="Väder">🌤️</span><div class="temp" id="temp">--°</div></div><div class="muted">TESTVÄDER · Påhittad temperatur och vind</div><div id="weather" class="muted">Hämtar aktuellt väder …</div></section><section class="card rotation-indicator" aria-label="Automatisk växling"><div class="hourglass" aria-hidden="true">⌛</div><div class="rotation-copy"><strong>AUTOMATISK VÄXLING</strong><div id="rotation-message">Kontrollerar vyer …</div><div class="rotation-track"><span id="rotation-progress"></span></div></div></section><section class="card lunch-card"><h2>DAGENS MATSEDEL · GÅNGHESTERSKOLAN</h2><div class="muted">TESTMENY · Påhittade rätter</div><div id="meal-date" class="muted"></div><div id="meal-content" class="meal-content">Hämtar matsedeln …</div><a class="link" href="https://menu.matildaplatform.com/meals/week/68d18b0e30b565aba61bf59e_boras-ganghesterskolan-kok" target="_blank" rel="noopener noreferrer">Veckans matsedel</a></section><section class="card"><h2>NÄSTA LOV · TESTDATA</h2><div style="font-size:23px;font-weight:750" id="break">TESTLOV</div><div class="muted" id="breakdate">Hämtar exempelperioder …</div><div id="break-count" class="break-count"></div><p class="muted">Påhittade testperioder. Officiella läsårstider är inte verifierade.</p></section></div>
+<nav class="calendar-tools dashboard-only" aria-label="Kalendervy">
+<div><button type="button" id="day-view" aria-pressed="false">Dag</button><button type="button" id="week-view" aria-pressed="true">Vecka</button></div>
+<label>Valt datum <input id="calendar-date" type="date" required></label>
+<div><button type="button" id="nav-prev" aria-label="Föregående period">‹</button><button type="button" id="nav-today">Idag</button><button type="button" id="nav-next" aria-label="Nästa period">›</button></div>
+<fieldset><legend>Visa kalendrar</legend><label><input id="filter-work" type="checkbox" checked>Min kalender (blå)</label><label><input id="filter-team" type="checkbox" checked>Resursteamet (grön)</label></fieldset>
+</nav><div class="calendar-layout"><section class="card"><h2 id="day-heading">DAGENS AKTIVITETER</h2><div class="muted" id="today-label"></div><div id="today-events" style="margin-top:14px" aria-live="polite"></div></section><section class="card" id="week-panel"><div class="week-head"><h2 style="margin:0">VECKOKALENDER</h2><div class="tv-only"><button id="prev-week" aria-label="Föregående vecka">‹</button> <strong id="week-range" style="font-size:13px"></strong> <button id="next-week" aria-label="Nästa vecka">›</button> <button id="current-week">Idag</button></div></div><div class="week-grid" id="week-grid"></div></section></div>
+<section class="card staff-panel dashboard-only"><h2>PERSONALPLANERING · TESTDATA</h2><p class="muted">Fem påhittade medarbetare. Statusändringar gäller bara i denna vy och återställs vid omladdning.</p><div id="staff-planning"></div></section><div class="workload-row"><section class="card pending-panel"><div class="week-head"><h2 style="margin:0">VÄNTANDE UPPDRAG <span class="muted">· DEMO</span></h2><span class="muted" id="pending-count"></span></div><div class="small-note">Endast testuppgifter – skriv inte in riktiga skolor, elevuppgifter eller ärenden här. Uppgifter i demon sparas inte.</div><div id="pending-list" class="pending-list"></div></section>
+<section class="card placement-panel"><div class="week-head"><h2 style="margin:0">PLACERINGAR & UTSKOLNING <span class="muted">· DEMO</span></h2><span id="placement-count" class="muted"></span></div><div class="small-note">Påhittade exempel. Nedräkning till angivet slutdatum i kalenderdagar – inte en automatisk juridisk bedömning.</div><div class="placement-list" id="placement-list"></div></section></div>
+<section class="card editor-only stress-panel"><h2>TESTDATA & BELASTNINGSTEST</h2><button type="button" id="reset-demo">Återställ testdata</button><p class="small-note">Lägg till påhittade testposter för att se hur 40-tums-TV:n hanterar 6 möten, 8 väntande uppdrag och 8 placeringar. Testet sparar inga uppgifter och ändrar inte dina riktiga kalenderaktiviteter.</p><div class="pills"><button type="button" id="stress-enable">Starta belastningstest</button><button type="button" id="stress-disable" disabled>Stäng av testet</button><span class="muted" id="stress-status" role="status">Testet är avstängt.</span></div></section><section class="card editor-only placement-editor"><h2>REGISTRERA TESTPLACERING</h2><p class="small-note">Använd bara fiktiva koder. Informationen sparas inte och försvinner när sidan laddas om.</p><form id="placement-form" class="placement-form"><label>Exempelkod<input id="placement-code" required maxlength="12" placeholder="Elev A"></label><label>Startdatum<input id="placement-start" type="date" required></label><label>Beslutat slutdatum<input id="placement-end" type="date" required></label><label>Fas<select id="placement-phase"><option value="Pågående">Pågående</option><option value="Utskolning">Utskolning</option></select></label><button type="submit">Lägg till testplacering</button></form><div class="muted" id="placement-feedback" role="status"></div></section><section class="card editor-only demo-initials-editor"><h2>VECKANS ELEVKODER · DEMO</h2><p class="small-note">Använd endast påhittade bokstavskoder här. Den offentliga demonstrationen lagrar inga verkliga elevscheman. Ändringarna gäller bara tills sidan laddas om.</p><div class="demo-initials-grid" id="demo-initials-form"></div><button type="button" id="reset-demo-initials">Återställ exempel</button></section><section class="card editor-only pending-editor"><h2>REGISTRERA TESTUPPDRAG</h2><form id="pending-form" class="pending-form"><label>Skola (fiktiv)<input id="pending-school" required maxlength="48" placeholder="Exempel: Skola A"></label><label>Preliminär start<input id="pending-start" type="date"></label><label>Status<select id="pending-status"><option>Ny förfrågan</option><option>Inväntar beslut</option><option>Under planering</option><option>Klar för start</option></select></label><button type="submit">Lägg till testuppdrag</button></form><div class="muted" id="pending-feedback" role="status"></div></section><section class="card editor-only" style="margin-top:14px"><h2 id="form-heading">LÄGG TILL AKTIVITET</h2><div class="small-note">Endast icke-känslig information. Använd endast påhittade testaktiviteter. Testaktiviteterna lagras i denna webbläsare på den här datorn, inte i GitHub eller Outlook. De är synliga och redigerbara för den som använder datorn och kan försvinna om webbläsardata rensas.</div><form id="entry-form" class="entry-form"><label>Datum<input id="entry-date" type="date" required></label><label>Tid<input id="entry-time" type="time" required></label><label>Kalender<select id="entry-source"><option value="work">Min kalender (blå)</option><option value="team">Resursteamet (grön)</option></select></label><label class="wide">Aktivitet<input id="entry-title" type="text" maxlength="90" placeholder="T.ex. Arbetsplatsträff" required></label><button type="submit" id="save-event">Lägg till</button><button type="button" id="cancel-edit" hidden>Avbryt redigering</button></form><div class="muted" id="save-feedback" role="status" style="margin-top:9px"></div></section><section class="card editor-only" style="margin-top:14px"><h2>SÄKERHETSKOPIA AV KALENDERN</h2><p class="muted">Spara en kopia som en JSON-fil på datorn. Filen innehåller aktiviteternas datum, tid och text och ska hanteras varsamt. Använd bara icke-känsliga aktiviteter. Import lägger till aktiviteter som saknas och ersätter inte befintliga.</p><div class="pills"><button id="export-events" type="button">Spara säkerhetskopia</button><label class="backup-label">Läs in säkerhetskopia <input type="file" id="import-events" accept=".json,application/json" aria-label="Välj säkerhetskopia i JSON-format"></label></div><div class="muted" id="backup-feedback" role="status" style="margin-top:10px"></div></section><div class="grid footer-grid editor-only"><section class="card"><h2>ANSLUTNINGAR</h2><p class="muted">Outlook är inte anslutet. Endast icke-känsliga aktiviteter som läggs in här visas i kalendern.</p></section><section class="card"><h2>SNABBLÄNKAR</h2><a class="link" href="https://outlook.boras.se/owa/" target="_blank" rel="noopener noreferrer">Öppna Outlook</a></section></div><p class="muted editor-only">Resursteamet · Kalenderaktiviteter lagras endast i den här webbläsaren.</p>
+</main>
+<script>
+(() => {
+  'use strict';
+  const key = d => [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  const today = new Date();
+  const day = n => {const d = new Date(today.getFullYear(),today.getMonth(),today.getDate()+n,12);return d;};
+  const monday = day(7-(today.getDay()+6)%7);
+  const end = new Date(monday);end.setDate(end.getDate()+4);
+  const meals = Array.from({length:36},(_,i)=>day(i-7)).filter(d=>d.getDay()!==0&&d.getDay()!==6).map(d=>({date:key(d),name:'Testmeny',dishes:['TEST · Grönsakspasta','TEST · Soppa med exempelbröd']}));
+  window.fetch = async input => {
+    const url = String(typeof input==='string' ? input : input.url);
+    let body;
+    if(url.startsWith('https://api.open-meteo.com/v1/forecast?'))body={current:{temperature_2m:12,wind_speed_10m:4,weather_code:2}};
+    else if(url.startsWith('menu.json'))body={updatedAt:today.toISOString(),source:'Testdata – ingen extern hämtning',meals};
+    else if(url==='demo-config.json')body={version:1,demo:true,breaks:[{name:'Påhittat exempellov',start:key(monday),end:key(end)}]};
+    else throw Error('Extern hämtning är avstängd i förhandsgranskningen.');
+    return new Response(JSON.stringify(body),{status:200,headers:{'Content-Type':'application/json'}});
+  };
+  document.addEventListener('click',event=>{
+    const link=event.target.closest('a');
+    if(link && link.getAttribute('href')?.startsWith('https:')){
+      event.preventDefault();
+      alert('Externa länkar är avstängda i denna förhandsgranskning med testdata.');
+    }
+  });
+})();
+</script>
+<script>/* Shared helpers for the fictional dashboard. No integration credentials or real records. */
+window.Dashboard = (() => {
+  'use strict';
+  const dateKey = d => [String(d.getFullYear()).padStart(4,'0'),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  const localDay = str => new Date(str + 'T12:00:00');
+  const addDays = (date, count) => { const d = new Date(date); d.setDate(d.getDate()+count); return d; };
+  const dayNumber = d => Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()) / 86400000);
+  const isDate = str => typeof str === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(str) && !Number.isNaN(localDay(str).getTime()) && dateKey(localDay(str)) === str;
+  const isEvent = e => !!e && typeof e.id === 'string' && e.id.trim().length > 0 && e.id.length < 100 && isDate(e.date) && typeof e.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(e.time) && ['work','team'].includes(e.source) && typeof e.title === 'string' && e.title.trim().length > 0 && e.title.length <= 90;
+  function readEvents(raw) {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data) || data.length > 500 || !data.every(isEvent)) throw Error('Kalendern innehåller ogiltiga testaktiviteter.');
+    if (new Set(data.map(e=>e.id)).size !== data.length) throw Error('Kalendern innehåller duplicerade ID.');
+    return data.map(({id,date,time,source,title})=>({id,date,time,source,title}));
+  }
+  function importEvents(parsed, existing) {
+    if (parsed?.format !== 'resursteamet-calendar' || parsed.version !== 1 || !Array.isArray(parsed.events)) throw Error('Filen har inte rätt säkerhetskopieringsformat.');
+    const imported = readEvents(JSON.stringify(parsed.events));
+    const ids = new Set(existing.map(e=>e.id));
+    const additions = imported.filter(e=>!ids.has(e.id));
+    if (existing.length + additions.length > 500) throw Error('Importen skulle överskrida gränsen på 500 aktiviteter.');
+    return additions;
+  }
+  function seedEvents(now) {
+    return [
+      {id:'demo-work',date:dateKey(now),time:'08:30',source:'work',title:'TEST · Egen planering'},
+      {id:'demo-team',date:dateKey(now),time:'10:00',source:'team',title:'TEST · Teamets avstämning'},
+      {id:'demo-next',date:dateKey(addDays(now,1)),time:'09:00',source:'team',title:'TEST · Gemensam uppföljning'}
+    ];
+  }
+  const staff = ['A','B','C','D','E'].map((code,index)=>({id:'staff-'+code.toLowerCase(),name:'Medarbetare '+code,index}));
+  const assignments = new Map();
+  const statuses = ['På plats','På uppdrag','Ej tillgänglig'];
+  function renderStaff(root, selected, view) {
+    const start = addDays(selected,-(selected.getDay()+6)%7);
+    const dates = view === 'day' ? [selected] : Array.from({length:5},(_,i)=>addDays(start,i));
+    root.replaceChildren();
+    for (const person of staff) {
+      const row = document.createElement('section'); row.className='staff-person';
+      const heading = document.createElement('h3'); heading.textContent=person.name;
+      const slots = document.createElement('div'); slots.className='staff-slots';
+      for (const date of dates) {
+        const key=person.id+':'+dateKey(date);
+        const label=document.createElement('label'); label.textContent=date.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
+        const input=document.createElement('select'); input.setAttribute('aria-label',person.name+', '+dateKey(date));
+        for(const status of statuses){const option=document.createElement('option');option.textContent=status;option.value=status;input.append(option);}
+        input.value=assignments.get(key) || (date.getDay()===0 || date.getDay()===6 ? 'Ej tillgänglig' : 'På plats');
+        input.addEventListener('change',()=>assignments.set(key,input.value));
+        label.append(input);slots.append(label);
+      }
+      row.append(heading,slots);root.append(row);
+    }
+  }
+  function renderBreak(config, now) {
+    if(config?.version!==1 || config.demo!==true || !Array.isArray(config.breaks) || config.breaks.length>100 || !config.breaks.every(b=>b && typeof b.name==='string' && b.name.trim() && b.name.length<=60 && isDate(b.start) && isDate(b.end) && b.end>=b.start)) throw Error('Ogiltiga testlov');
+    const today=dateKey(now);
+    const current=config.breaks.filter(b=>b.end>=today).sort((a,b)=>a.start.localeCompare(b.start))[0];
+    document.getElementById('break').textContent=current?'TEST · '+current.name:'TESTLOV';
+    document.getElementById('breakdate').textContent=current?current.start+' – '+current.end:'Ej officiella läsårstider';
+    document.getElementById('break-count').textContent=!current?'Inget kommande testlov angivet':current.start<=today?'Testlov pågår':(dayNumber(localDay(current.start))-dayNumber(now))+' kalenderdagar till testlov';
+  }
+  return {dateKey,localDay,addDays,dayNumber,isDate,isEvent,readEvents,importEvents,seedEvents,renderStaff,renderBreak};
+})();
+</script><script>
+function updateTime(){const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});document.getElementById('date').textContent=d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}updateTime();setInterval(updateTime,30000);
+
+let breakConfig=null,breakConfigFailed=false;
+function updateBreakCount(){
+ try{
+  if(!breakConfig)throw Error('Ingen konfiguration');
+  Dashboard.renderBreak(breakConfig,new Date());
+ }catch(e){
+  document.getElementById('break').textContent='TESTLOV';
+  document.getElementById('breakdate').textContent='Ej officiella läsårstider';
+  document.getElementById('break-count').textContent=breakConfigFailed||breakConfig?'Lovinställningarna kunde inte läsas.':'Hämtar testlov …';
+ }
+}
+(async()=>{try{const response=await fetch('demo-config.json',{signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error('Saknas');breakConfig=await response.json();}catch(e){breakConfigFailed=true;}updateBreakCount();})();
+updateBreakCount();setInterval(updateBreakCount,60*60*1000);
+(async()=>{try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=57.7210&longitude=12.9401&current=temperature_2m,wind_speed_10m,weather_code&timezone=Europe%2FStockholm',{signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Väder saknas');const j=await r.json();const c=j.current;if(typeof c?.temperature_2m!=='number')throw Error('Inget värde');document.getElementById('temp').textContent=Math.round(c.temperature_2m)+'°';const code=c.weather_code;const icon=code===0?'☀️':code===1||code===2?'🌤️':code===3?'☁️':code===45||code===48?'🌫️':code>=51&&code<=67?'🌧️':code>=71&&code<=77?'❄️':code>=80&&code<=82?'🌦️':code>=85&&code<=86?'🌨️':code>=95?'⛈️':'🌤️';const iconEl=document.getElementById('weather-icon');iconEl.textContent=icon;iconEl.setAttribute('aria-label','Aktuellt väder');document.getElementById('weather').textContent='Vind: '+Math.round(c.wind_speed_10m||0)+' km/h';}catch(e){document.getElementById('weather').textContent='Vädret är tillfälligt otillgängligt';}})();
+
+const storeKey='resursteamet_preview_a44242f_calendar_v1';
+let events=Dashboard.seedEvents(new Date());
+try{const raw=localStorage.getItem(storeKey);if(raw!==null)events=Dashboard.readEvents(raw);}catch(e){document.getElementById('demo-feedback').textContent='Sparad testkalender var ogiltig eller otillgänglig. Påhittade exempel visas.';}
+// Demo only: invented codes, deliberately not persisted.
+const demoDefaults=['A + D + E + M + Ma','A + E + M','D + E + Ma','A + E + M','A + D + Ma','',''];
+let demoInitials=demoDefaults.slice();
+const demoDays=['Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag','Söndag'];
+function buildDemoInitials(){const root=document.getElementById('demo-initials-form');root.replaceChildren();demoDays.forEach((day,i)=>{const label=document.createElement('label');label.textContent=day;const input=document.createElement('input');input.type='text';input.maxLength=60;input.value=demoInitials[i];input.setAttribute('aria-label','Exempelkoder för '+day);input.addEventListener('input',()=>{demoInitials[i]=input.value.slice(0,60);renderCalendar();});label.append(input);root.append(label);});}
+document.getElementById('reset-demo-initials').addEventListener('click',()=>{demoInitials=demoDefaults.slice();buildDemoInitials();renderCalendar();});
+buildDemoInitials();
+const dateKey=Dashboard.dateKey;
+const dayFormat=d=>d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
+const monday=d=>{const x=Dashboard.localDay(dateKey(d));x.setDate(x.getDate()-(x.getDay()+6)%7);return x;};
+let selectedDate=Dashboard.localDay(dateKey(new Date()));
+let calendarView=matchMedia('(max-width:680px)').matches?'day':'week';
+const sourceFilters={work:true,team:true};
+let editingId=null;
+function startEditing(e){editingId=e.id;document.getElementById('entry-date').value=e.date;document.getElementById('entry-time').value=e.time;document.getElementById('entry-source').value=e.source;document.getElementById('entry-title').value=e.title;document.getElementById('form-heading').textContent='REDIGERA AKTIVITET';document.getElementById('save-event').textContent='Spara ändringar';document.getElementById('cancel-edit').hidden=false;document.getElementById('entry-form').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('entry-title').focus();}
+function stopEditing(){editingId=null;document.getElementById('form-heading').textContent='LÄGG TILL AKTIVITET';document.getElementById('save-event').textContent='Lägg till';document.getElementById('cancel-edit').hidden=true;document.getElementById('entry-form').reset();document.getElementById('entry-date').value=dateKey(new Date());}
+document.getElementById('cancel-edit').addEventListener('click',stopEditing);
+let stressEvents=[];const sorted=()=>events.concat(stressEvents).filter(e=>sourceFilters[e.source]).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+function renderCalendar(){
+ const now=new Date(),today=dateKey(now),start=monday(selectedDate),selected=dateKey(selectedDate);
+ const isTV=document.body.classList.contains('display-view');
+ document.getElementById('calendar-date').value=selected;
+ document.getElementById('week-panel').hidden=!isTV&&calendarView==='day';
+ document.getElementById('day-view').setAttribute('aria-pressed',String(calendarView==='day'));
+ document.getElementById('week-view').setAttribute('aria-pressed',String(calendarView==='week'));
+ document.getElementById('day-heading').textContent=selected===today?'DAGENS AKTIVITETER':'VALD DAGS AKTIVITETER';
+ document.getElementById('today-label').textContent=selectedDate.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+ const todayBox=document.getElementById('today-events');todayBox.replaceChildren();
+ const todays=sorted().filter(e=>e.date===selected);if(!todays.length){const p=document.createElement('p');p.className='muted';p.textContent='Inga testaktiviteter för vald dag och valda kalendrar.';todayBox.append(p);}
+ for(const e of todays){const item=document.createElement('div');item.className='activity '+(e.source==='team'?'team':'');const line=document.createElement('div');const time=document.createElement('span');time.className='event-time';time.textContent=e.time;const title=document.createElement('span');title.textContent=e.title;line.append(time,title);const sub=document.createElement('div');sub.className='muted';sub.textContent=e.source==='team'?'Resursteamet':'Min kalender';item.append(line,sub);const edit=document.createElement('button');edit.type='button';edit.className='tiny editor-action';edit.style.marginTop='7px';edit.textContent='Redigera';edit.addEventListener('click',()=>startEditing(e));if(!e.demoStress)item.append(edit);todayBox.append(item);}
+ Dashboard.renderStaff(document.getElementById('staff-planning'),selectedDate,calendarView);
+ const end=new Date(start);end.setDate(end.getDate()+6);document.getElementById('week-range').textContent=dayFormat(start)+' – '+dayFormat(end);
+ const grid=document.getElementById('week-grid');grid.replaceChildren();for(let i=0;i<(document.body.classList.contains('display-view')?5:7);i++){const d=new Date(start);d.setDate(d.getDate()+i);const key=dateKey(d);const cell=document.createElement('div');cell.className='day'+(key===today?' today':'');const head=document.createElement('div');head.className='day-title';head.textContent=dayFormat(d);cell.append(head);const initial=document.createElement('div');initial.className='day-initials'+(demoInitials[i]?'':' day-initials-empty');initial.textContent=demoInitials[i]||'–';initial.title='Påhittade elevkoder – demo';cell.append(initial);const found=sorted().filter(e=>e.date===key);for(const e of found){const pill=document.createElement('div');pill.className='week-event '+(e.source==='team'?'team':'');const title=document.createElement('div');title.textContent=e.time+' '+e.title;const source=document.createElement('div');source.className='muted';source.textContent=e.source==='team'?'Resursteamet':'Min kalender';title.append(source);const actions=document.createElement('div');actions.className='event-actions';const del=document.createElement('button');del.type='button';del.className='tiny editor-action';del.textContent='Ta bort';del.setAttribute('aria-label','Ta bort '+e.title);del.addEventListener('click',()=>{if(!confirm('Ta bort aktiviteten?'))return;events=events.filter(x=>x.id!==e.id);if(editingId===e.id)stopEditing();save();});const edit=document.createElement('button');edit.type='button';edit.className='tiny editor-action';edit.textContent='Redigera';edit.addEventListener('click',()=>startEditing(e));if(!e.demoStress)actions.append(edit,del);pill.append(title,actions);cell.append(pill);}grid.append(cell);}
+}
+function save(){try{localStorage.setItem(storeKey,JSON.stringify(events));document.getElementById('save-feedback').textContent='Sparat i den här webbläsaren.';}catch(e){document.getElementById('save-feedback').textContent='Kunde inte spara lokalt. Kontrollera webbläsarens inställningar.';}renderCalendar();}
+document.getElementById('entry-date').value=dateKey(new Date());
+document.getElementById('entry-form').addEventListener('submit',e=>{e.preventDefault();const date=document.getElementById('entry-date').value,time=document.getElementById('entry-time').value,source=document.getElementById('entry-source').value,title=document.getElementById('entry-title').value.trim();if(!Dashboard.isEvent({id:'new',date,time,source,title}))return;if(!editingId&&events.length>=500){document.getElementById('save-feedback').textContent='Max 500 testaktiviteter. Exportera eller ta bort innan du lägger till fler.';return;}if(editingId){const existing=events.find(x=>x.id===editingId);if(existing){Object.assign(existing,{date,time,source,title});}else{document.getElementById('save-feedback').textContent='Aktiviteten finns inte längre.';stopEditing();return;}}else{events.push({id:String(Date.now())+'-'+Math.random().toString(36).slice(2),date,time,source,title});}stopEditing();selectedDate=Dashboard.localDay(date);save();});
+function navigatePeriod(step){selectedDate=Dashboard.addDays(selectedDate,step*(calendarView==='day'?1:7));renderCalendar();}
+function selectToday(){selectedDate=Dashboard.localDay(dateKey(new Date()));renderCalendar();}
+document.getElementById('prev-week').addEventListener('click',()=>{selectedDate=Dashboard.addDays(selectedDate,-7);renderCalendar();});
+document.getElementById('next-week').addEventListener('click',()=>{selectedDate=Dashboard.addDays(selectedDate,7);renderCalendar();});
+document.getElementById('current-week').addEventListener('click',selectToday);
+document.getElementById('nav-prev').addEventListener('click',()=>navigatePeriod(-1));
+document.getElementById('nav-next').addEventListener('click',()=>navigatePeriod(1));
+document.getElementById('nav-today').addEventListener('click',selectToday);
+document.getElementById('calendar-date').addEventListener('change',e=>{if(Dashboard.isDate(e.target.value)){selectedDate=Dashboard.localDay(e.target.value);renderCalendar();}});
+for(const view of ['day','week'])document.getElementById(view+'-view').addEventListener('click',()=>{calendarView=view;renderCalendar();});
+for(const source of ['work','team'])document.getElementById('filter-'+source).addEventListener('change',e=>{sourceFilters[source]=e.target.checked;renderCalendar();});
+renderCalendar();setInterval(renderCalendar,60000);
+
+const backupFeedback=document.getElementById('backup-feedback');
+document.getElementById('export-events').addEventListener('click',()=>{
+ const data={format:'resursteamet-calendar',version:1,exportedAt:new Date().toISOString(),events};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='resursteamet-kalender-'+dateKey(new Date())+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ backupFeedback.textContent='Säkerhetskopian har förberetts för nedladdning. Kontrollera att filen sparades.';
+});
+document.getElementById('import-events').addEventListener('change',async event=>{
+ const file=event.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>1024*1024)throw Error('Filen är för stor (max 1 MB).');
+  const parsed=JSON.parse(await file.text());
+  const additions=Dashboard.importEvents(parsed,events);
+  if(!additions.length){backupFeedback.textContent='Alla aktiviteter finns redan. Inget ändrades.';return;}
+  if(events.length+additions.length>500)throw Error('Importen skulle överskrida gränsen på 500 aktiviteter.');
+  if(!confirm('Lägg till '+additions.length+' aktiviteter från säkerhetskopian? Befintliga aktiviteter behålls.'))return;
+  const previous=events;events=events.concat(additions.map(x=>({id:x.id,date:x.date,time:x.time,source:x.source,title:x.title})));
+  try{localStorage.setItem(storeKey,JSON.stringify(events));}catch(e){events=previous;throw Error('Det gick inte att spara aktiviteterna i webbläsaren.');}
+  renderCalendar();backupFeedback.textContent=additions.length+' aktiviteter lästes in. Befintliga aktiviteter behölls.';
+ }catch(e){backupFeedback.textContent=e.message||'Det gick inte att läsa filen.';}finally{event.target.value='';}
+});
+
+const viewKey='resursteamet_preview_a44242f_view_v1';
+function setMode(mode){
+ for(const name of ['display','edit','dashboard']){
+  document.body.classList.toggle(name+'-view',name===mode);
+  document.getElementById(name+'-mode').setAttribute('aria-pressed',String(name===mode));
+ }
+ renderCalendar();
+ try{localStorage.setItem(viewKey,mode);}catch(e){}
+}
+for(const mode of ['display','edit','dashboard'])document.getElementById(mode+'-mode').addEventListener('click',()=>setMode(mode));
+try{const saved=localStorage.getItem(viewKey);setMode(['display','edit','dashboard'].includes(saved)?saved:'dashboard');}catch(e){setMode('dashboard');}
+document.getElementById('reset-demo').addEventListener('click',()=>{
+ if(!confirm('Återställ endast testdata? Tidigare kalenderdata lämnas kvar.'))return;
+ try{localStorage.removeItem(storeKey);location.reload();}catch(e){document.getElementById('demo-feedback').textContent='Testdata kunde inte återställas i webbläsaren.';}
+});
+let latestMenuData={meals:[]};
+function renderMeal(data){
+ const now=new Date(), target=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ if(now.getHours()>=13 || target.getDay()===0 || target.getDay()===6)target.setDate(target.getDate()+1);
+ while(target.getDay()===0 || target.getDay()===6)target.setDate(target.getDate()+1);
+ const isToday=dateKey(target)===dateKey(now);
+ document.querySelector('.lunch-card h2').textContent=(isToday?'DAGENS MATSEDEL':'NÄSTA SKOLDAGS MATSEDEL')+' · GÅNGHESTERSKOLAN';
+ document.getElementById('meal-date').textContent=target.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+ const meal=document.getElementById('meal-content');
+ const meals=Array.isArray(data?.meals)?data.meals:[];
+ const found=meals.find(m=>typeof m?.date==='string' && m.date.slice(0,10)===dateKey(target));
+ meal.replaceChildren();
+ if(!found||!Array.isArray(found.dishes)||!found.dishes.length){
+   meal.textContent='Ingen meny publicerad för '+target.toLocaleDateString('sv-SE',{weekday:'long'})+'. Se veckans matsedel.';
+   return;
+ }
+ found.dishes.forEach(d=>{const row=document.createElement('div');row.textContent=String(d);meal.append(row);});
+}
+async function loadMeal(){
+ try{const r=await fetch('menu.json?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Saknas');const j=await r.json();latestMenuData=j;renderMeal(j);}
+ catch(e){renderMeal(latestMenuData);}
+}
+loadMeal();setInterval(loadMeal,15*60*1000);setInterval(()=>renderMeal(latestMenuData),60*1000);
+
+// Demonstrationsuppdrag hålls endast i minnet: ingen lokal eller offentlig lagring av elevärenden.
+const pendingDemo=[
+ {school:'Skola A',start:'',status:'Ny förfrågan'},
+ {school:'Skola B',start:'',status:'Under planering'}
+];
+function renderPending(){
+ document.getElementById('pending-count').textContent=pendingDemo.length+' väntande';
+ const list=document.getElementById('pending-list');list.replaceChildren();
+ if(!pendingDemo.length){const p=document.createElement('p');p.className='muted';p.textContent='Inga testuppdrag';list.append(p);return;}
+ for(const [index,p] of pendingDemo.entries()){
+  const item=document.createElement('div');item.className='pending-item';
+  const school=document.createElement('strong');school.textContent=p.school;
+  const date=document.createElement('div');date.className='muted';date.textContent='Start: '+(p.start?p.start:'Ej fastställd');
+  const status=document.createElement('div');status.className='muted pending-status';status.textContent=p.status;
+  const controls=document.createElement('div');controls.className='editor-action';controls.style.marginTop='7px';const reject=document.createElement('button');reject.type='button';reject.className='tiny';reject.textContent='Avslå / ta bort';reject.addEventListener('click',()=>{if(!confirm('Ta bort testuppdraget från '+p.school+' ur väntelistan?'))return;pendingDemo.splice(index,1);document.getElementById('pending-feedback').textContent='Uppdraget togs bort från väntelistan.';renderPending();});const label=document.createElement('label');label.textContent='Status';
+  const selector=document.createElement('select');selector.setAttribute('aria-label','Status för '+p.school);
+  for(const value of ['Ny förfrågan','Inväntar beslut','Under planering','Klar för start']){const option=document.createElement('option');option.value=value;option.textContent=value;selector.append(option);}
+  selector.value=p.status;selector.addEventListener('change',()=>{p.status=selector.value;status.textContent=p.status;});label.append(selector);
+  controls.append(label,reject);item.append(school,date,status,controls);list.append(item);
+ }
+}
+document.getElementById('pending-form').addEventListener('submit',e=>{
+ e.preventDefault();const school=document.getElementById('pending-school').value.trim();
+ if(!school)return;
+ pendingDemo.push({school,start:document.getElementById('pending-start').value,status:document.getElementById('pending-status').value});
+ document.getElementById('pending-form').reset();
+ document.getElementById('pending-feedback').textContent='Testuppdraget visas nu i demon och försvinner vid omladdning.';
+ renderPending();
+});
+renderPending();
+
+const placementsDemo=[
+ {code:'Elev A',start:dateKey(Dashboard.addDays(new Date(),-14)),end:dateKey(Dashboard.addDays(new Date(),14)),phase:'Pågående'},
+ {code:'Elev B',start:dateKey(Dashboard.addDays(new Date(),-7)),end:dateKey(Dashboard.addDays(new Date(),7)),phase:'Utskolning'}
+];
+const localDay=Dashboard.localDay;
+function renderPlacements(){
+ const list=document.getElementById('placement-list');list.replaceChildren();
+ const today=new Date();today.setHours(12,0,0,0);
+ const leaving=placementsDemo.filter(x=>x.phase==='Utskolning').length;
+ document.getElementById('placement-count').textContent=placementsDemo.length+' placeringar · '+leaving+' utskolning';
+ if(!placementsDemo.length){const el=document.createElement('p');el.className='muted';el.textContent='Inga testplaceringar';list.append(el);}
+ for(const [index,p] of placementsDemo.entries()){
+  const remaining=(Dashboard.dayNumber(localDay(p.end))-Dashboard.dayNumber(today));
+  const total=Math.max(1,(Dashboard.dayNumber(localDay(p.end))-Dashboard.dayNumber(localDay(p.start))));
+  const elapsed=Math.max(0,Math.min(total,total-remaining));
+  const item=document.createElement('div');item.className='placement-item'+(p.phase==='Utskolning'?' leaving':'');
+  const name=document.createElement('strong');name.textContent=p.code+' · '+p.phase;
+  const end=document.createElement('div');end.className='muted';end.textContent='Planerat slut: '+p.end;
+  const time=document.createElement('div');time.className='muted';time.textContent=remaining>0?remaining+' kalenderdagar kvar':remaining===0?'Slutdatum idag':'Slutdatum passerat';
+  const track=document.createElement('div');track.className='placement-progress';const fill=document.createElement('span');fill.style.width=100*elapsed/total+'%';track.append(fill);
+  const del=document.createElement('button');del.type='button';del.className='tiny editor-action';del.textContent='Ta bort testplacering';del.addEventListener('click',()=>{if(!confirm('Ta bort testplaceringen '+p.code+'?'))return;placementsDemo.splice(index,1);renderPlacements();});
+  item.append(name,end,time,track,del);list.append(item);
+ }
+}
+document.getElementById('placement-form').addEventListener('submit',e=>{
+ e.preventDefault();const code=document.getElementById('placement-code').value.trim();
+ const start=document.getElementById('placement-start').value,end=document.getElementById('placement-end').value;
+ if(!code||!Dashboard.isDate(start)||!Dashboard.isDate(end))return;
+ if(end<start){document.getElementById('placement-feedback').textContent='Slutdatum måste vara samma dag eller senare än startdatum.';return;}
+ placementsDemo.push({code,start,end,phase:document.getElementById('placement-phase').value});
+ document.getElementById('placement-form').reset();
+ document.getElementById('placement-feedback').textContent='Testplacering tillagd (försvinner vid omladdning).';renderPlacements();
+});
+renderPlacements();setInterval(renderPlacements,60*60*1000);
+
+let tvPage=0;
+function updateTvPages(){
+ const isTV=document.body.classList.contains('display-view');
+ const groups=[
+  {items:[...document.querySelectorAll('#today-events .activity')],per:4,id:'today-label'},
+  {items:[...document.querySelectorAll('#pending-list .pending-item')],per:4,id:'pending-count'},
+  {items:[...document.querySelectorAll('#placement-list .placement-item')],per:4,id:'placement-count'}
+ ];
+ const infoIds=['today-label','pending-count','placement-count'];
+ groups.forEach((group,i)=>{
+  const pages=Math.max(1,Math.ceil(group.items.length/group.per));
+  group.items.forEach((el,index)=>{el.dataset.tvHidden=String(isTV && Math.floor(index/group.per)!==(tvPage%pages));});
+  let label=document.getElementById('tv-page-'+i);
+  if(!label){label=document.createElement('span');label.id='tv-page-'+i;label.className='tv-pager';document.getElementById(infoIds[i]).after(label);}
+  label.textContent=isTV&&pages>1?'Visar '+(tvPage%pages+1)+'/'+pages+' · '+group.items.length+' totalt':'';
+ });
+ document.querySelectorAll('#week-grid .day').forEach((day,i)=>{
+  const items=[...day.querySelectorAll('.week-event')],per=4,pages=Math.max(1,Math.ceil(items.length/per));
+  items.forEach((el,index)=>{el.dataset.tvHidden=String(isTV&&Math.floor(index/per)!==(tvPage%pages));});
+  let label=day.querySelector('.tv-pager');
+  if(!label){label=document.createElement('div');label.className='tv-pager';day.append(label);}
+  label.textContent=isTV&&pages>1?'Aktiviteter '+(tvPage%pages+1)+'/'+pages:'';
+ });
+}
+const rotationDuration=12000;let rotationStarted=Date.now();
+function updateRotationIndicator(){
+ const remaining=Math.max(1,Math.ceil((rotationDuration-(Date.now()-rotationStarted)%rotationDuration)/1000));
+ const isTV=document.body.classList.contains('display-view');
+ const groups=[{name:'dagens aktiviteter',count:document.querySelectorAll('#today-events .activity').length},{name:'väntande uppdrag',count:document.querySelectorAll('#pending-list .pending-item').length},{name:'placeringar',count:document.querySelectorAll('#placement-list .placement-item').length}];
+ const changes=groups.filter(g=>g.count>4);
+ document.getElementById('rotation-message').textContent=changes.length?'Nästa vy om '+remaining+' s':'All information visas';
+ document.getElementById('rotation-progress').style.width=changes.length?(100*(rotationDuration-(Date.now()-rotationStarted)%rotationDuration)/rotationDuration)+'%':'100%';
+ document.querySelector('.rotation-indicator .hourglass').style.animationPlayState=isTV&&changes.length?'running':'paused';
+}
+setInterval(()=>{tvPage++;rotationStarted=Date.now();updateTvPages();updateRotationIndicator();},rotationDuration);
+setInterval(updateRotationIndicator,250);updateRotationIndicator();
+setInterval(updateTvPages,1500);
+
+let stressBackup=null;
+const stressEnable=document.getElementById('stress-enable'),stressDisable=document.getElementById('stress-disable'),stressStatus=document.getElementById('stress-status');
+stressEnable.addEventListener('click',()=>{
+ if(stressBackup)return;
+ stressBackup={pending:pendingDemo.map(x=>({...x})),placements:placementsDemo.map(x=>({...x}))};
+ const now=new Date(),day=dateKey(now);
+ stressEvents=['08:00','09:15','10:30','11:30','13:00','14:30'].map((time,i)=>({id:'stress-'+i, date:day,time,title:'TESTMÖTE '+(i+1),source:i%2?'team':'work',demoStress:true}));
+ const firstPending=Array.from({length:8},(_,i)=>({school:'Testskola '+(i+1),start:i%3?'':'2026-11-02',status:i%2?'Under planering':'Ny förfrågan'}));
+ const starts=[-5,-9,-2,-13,-4,-7,-11,-1],lengths=[17,21,10,28,24,12,14,8];
+ const placementTests=starts.map((ago,i)=>{const from=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ago,12);const end=new Date(from.getFullYear(),from.getMonth(),from.getDate()+lengths[i],12);return {code:'Testplats '+(i+1),start:dateKey(from),end:dateKey(end),phase:i%3===0?'Utskolning':'Pågående'};});
+ pendingDemo.splice(0,pendingDemo.length,...firstPending);placementsDemo.splice(0,placementsDemo.length,...placementTests);
+ stressEnable.disabled=true;stressDisable.disabled=false;stressStatus.textContent='Full beläggning aktiv · endast påhittade poster.';
+ renderCalendar();renderPending();renderPlacements();if(typeof updateTvPages==='function')updateTvPages();
+});
+stressDisable.addEventListener('click',()=>{
+ if(!stressBackup)return;
+ stressEvents=[];pendingDemo.splice(0,pendingDemo.length,...stressBackup.pending);placementsDemo.splice(0,placementsDemo.length,...stressBackup.placements);stressBackup=null;
+ stressEnable.disabled=false;stressDisable.disabled=true;stressStatus.textContent='Testet är avstängt.';
+ renderCalendar();renderPending();renderPlacements();if(typeof updateTvPages==='function')updateTvPages();
+});
+</script></body></html>
