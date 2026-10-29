@@ -50,14 +50,14 @@ function renderStudents(){
 ['today','week'].forEach(v=>$('student-'+v).addEventListener('click',()=>{studentMode=v;renderStudents();}));
 function renderHomeMeetings(){
  const root=$('home-meetings');root.replaceChildren();
- const examples=[{start:'09:00',end:'09:20',kind:'Morgonavstämning',person:null},{start:'13:30',end:'14:15',kind:'Pedagogiskt möte',person:people[1]}];
+ const examples=[{start:'08:15',end:'09:00',kind:'Morgonavstämning',person:people[0]},{start:'09:00',end:'10:30',kind:'Observation',person:people[2]},{start:'10:00',end:'12:00',kind:'Utskolning',person:people[3],student:'Elev C'},{start:'11:15',end:'12:00',kind:'Handled ning'.replace(' ',''),person:people[1]},{start:'13:00',end:'14:00',kind:'Pedagogiskt möte',person:people[4]},{start:'14:15',end:'15:00',kind:'Uppföljningsmöte',person:people[0]}];
  const all=examples.concat(visibleAppointments().filter(x=>x.date===today)).sort((a,b)=>a.start.localeCompare(b.start));
  for(const meeting of all){
   const item=document.createElement('div');item.className='home-meeting';
   if(meeting.person)item.style.borderLeftColor=colored(meeting.person);
   if(meeting.kind==='Utskolning')item.classList.add('is-exit');
   const time=document.createElement('strong');time.textContent=meeting.start;
-  const description=document.createElement('span');description.textContent=meeting.kind+(meeting.student?' · '+meeting.student:'');
+  const description=document.createElement('span');description.textContent=meeting.kind+(meeting.student?' · '+meeting.student:'')+(meeting.person?' · '+meeting.person.replace('Medarbetare ',''):'');
   item.append(time,description);root.append(item);
  }
  if(!all.length){const p=document.createElement('p');p.className='note';p.textContent='Inga möten idag';root.append(p);}
