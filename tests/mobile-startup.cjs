@@ -32,6 +32,11 @@ async function main(){
  assert.equal(fetches.length,2);
  assert.equal(nodes.get('weather-temp').textContent,'8°');
  assert.equal(nodes.get('menu-today').textContent,'Ingen aktuell matsedel');
+ tabs.find(x=>x.dataset.tab==='teamet').listeners.click();
+ const teamStatus=(person,slot)=>nodes.get('team-list').children[person*5+slot+1].children[1].textContent;
+ assert.match(teamStatus(3,1),/10:00–12:00 · Utskolning · Elev C/,'team must show calendar activity and linked pupil');
+ assert.ok(!teamStatus(3,0).includes('Elev C'),'10:00 activity must not overlap 08–10');
+ assert.ok(!teamStatus(3,2).includes('Elev C'),'activity ending at 12:00 must not overlap 12–14');
  tabs.find(x=>x.dataset.tab==='planering').listeners.click();
  const agenda=nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row');
  assert.equal(agenda.length,meetings.length,'home and calendar must contain the same daily meetings');
@@ -41,12 +46,21 @@ async function main(){
  }
  nodes.get('new-appointment').listeners.click();
  nodes.get('appt-note').value='Testbokning';
+ nodes.get('appt-person').value='Medarbetare E';
+ nodes.get('appt-start').value='15:30';
+ nodes.get('appt-end').value='16:00';
+ nodes.get('appt-kind').value='Utskolning';
+ nodes.get('appt-student').value='Elev J';
  nodes.get('appointment-form').listeners.submit({preventDefault(){}});
+ tabs.find(x=>x.dataset.tab==='teamet').listeners.click();
+ assert.match(teamStatus(4,3),/15:30–16:00 · Utskolning · Elev J/);
  assert.equal(nodes.get('home-meetings').children.length,meetings.length+1);
  const added=nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row');
  assert.equal(added.length,meetings.length+1);
  const custom=added.find(row=>row.children[0].children[1].textContent.includes('Testbokning'));
  custom.children[1].children[1].listeners.click();
+ tabs.find(x=>x.dataset.tab==='teamet').listeners.click();
+ assert.ok(!teamStatus(4,3).includes('Elev J'));
  assert.equal(nodes.get('home-meetings').children.length,meetings.length);
  assert.equal(nodes.get('agenda-list').children.filter(x=>x.className==='agenda-row').length,meetings.length);
  console.log('PASS: mobile startup, '+meetings.length+' shared meetings, matching calendar order/colors, pupil link, add/delete updates both views, weather and lunch requests');
