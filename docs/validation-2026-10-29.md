@@ -1,5 +1,7 @@
 # Verifiering 2026-10-29
 
+Denna rapport gäller den första implementationen. Se [uppföljningen av fyra tidspass](granskning-fyra-tidspass-2026-10-29.md) för den senaste körningen med 34 tester.
+
 Utvecklingsgren: `utveckling/dashboard-demo-2026-10-29`. Designen godkändes i chatten före implementation. Ingen produktionsändring ingår.
 
 ## Genomförda kontroller

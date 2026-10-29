@@ -357,3 +357,83 @@ class DashboardTests(unittest.TestCase):
         for route in pending:
             route.abort()
         self.assertEqual(self.errors,[])
+
+    def test_four_staff_slots_and_all_activity_options_are_independent(self):
+        self.open();self.page.locator('#day-view').click()
+        activities=['På plats','Inledande möte','Pedagogiskt möte','Uppföljningsmöte','Avslutande möte','Utskolning','Observation','Handledning','Privat','Annat','Frånvarande']
+        slots=['08–10','10–12','12–14','14–16']
+        expected={}
+        for person_index,person in enumerate('ABCDE'):
+            row=self.page.locator('.staff-person').filter(has=self.page.get_by_role('heading',name='Medarbetare '+person,exact=True))
+            self.assertEqual(row.locator('select').count(),4)
+            for slot_index,slot in enumerate(slots):
+                label=f'Medarbetare {person}, 2026-10-29, {slot}'
+                control=self.page.get_by_label(label,exact=True)
+                self.assertEqual(control.locator('option').evaluate_all('(options)=>options.map(o=>o.value)'),activities)
+                self.assertEqual(control.input_value(),'På plats')
+                value=activities[(person_index*4+slot_index)%len(activities)]
+                control.select_option(value);expected[label]=value
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.locator('#week-view').click()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),100)
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.locator('#day-view').click()
+        self.page.locator('#nav-next').click()
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+        self.page.locator('#nav-prev').click()
+        for label,value in expected.items():
+            self.assertEqual(self.page.get_by_label(label,exact=True).input_value(),value)
+        self.page.reload();self.page.locator('#day-view').click()
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+        self.assertEqual(self.errors,[])
+
+    def test_staff_activity_keyboard_focus_survives_minute_refresh(self):
+        self.open();self.page.locator('#day-view').click()
+        control=self.page.get_by_label('Medarbetare E, 2026-10-29, 14–16',exact=True)
+        control.select_option('Pedagogiskt möte')
+        control.focus()
+        self.page.clock.fast_forward(60001)
+        self.assertTrue(control.evaluate('(el)=>el===document.activeElement'))
+        self.assertEqual(control.input_value(),'Pedagogiskt möte')
+        self.page.keyboard.press('Tab')
+        self.assertFalse(control.evaluate('(el)=>el===document.activeElement'))
+
+    def test_staff_weekend_default_does_not_leak_to_weekdays(self):
+        self.open();self.page.locator('#day-view').click()
+        self.page.locator('#calendar-date').fill('2026-10-31')
+        self.page.locator('#nav-next').focus()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),20)
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'Frånvarande')
+        self.page.locator('#week-view').click()
+        self.assertEqual(self.page.locator('#staff-planning select').count(),100)
+        for control in self.page.locator('#staff-planning select').all():
+            self.assertEqual(control.input_value(),'På plats')
+
+    def test_four_staff_slots_fit_mobile_desktop_and_full_hd(self):
+        self.open()
+        for width,height in [(390,844),(1440,900),(1920,1080)]:
+            self.page.set_viewport_size({'width':width,'height':height})
+            for view,number in [('day',20),('week',100)]:
+                with self.subTest(viewport=(width,height),view=view):
+                    self.page.locator('#'+view+'-view').click()
+                    self.assertEqual(self.page.locator('#staff-planning select').count(),number)
+                    for control in self.page.locator('#staff-planning select').all():
+                        control.select_option('Uppföljningsmöte')
+                    outside=self.page.locator('.staff-person').evaluate_all('''rows=>rows.flatMap(row=>{
+                      const box=row.getBoundingClientRect();
+                      return [...row.querySelectorAll('select')].filter(input=>{
+                        const r=input.getBoundingClientRect();
+                        return r.left<box.left-1||r.right>box.right+1||r.top<box.top-1||r.bottom>box.bottom+1;
+                      }).map(input=>input.getAttribute('aria-label'));
+                    })''')
+                    self.assertEqual(outside,[])
+                    self.assertFalse(self.page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+            self.page.locator('#display-mode').click()
+            self.assertFalse(self.page.locator('#staff-planning').is_visible())
+            self.page.locator('#dashboard-mode').click()
+        self.assertEqual(self.errors,[])

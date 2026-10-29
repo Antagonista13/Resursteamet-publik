@@ -32,7 +32,11 @@ window.Dashboard = (() => {
   const assignments = new Map();
   const statuses = ['På plats','Inledande möte','Pedagogiskt möte','Uppföljningsmöte','Avslutande möte','Utskolning','Observation','Handledning','Privat','Annat','Frånvarande'];
   const timeSlots = ['08–10','10–12','12–14','14–16'];
+  const renderedStaffViews = new WeakMap();
   function renderStaff(root, selected, view) {
+    // Calendar refreshes must not replace focused or open activity controls.
+    const renderKey = view+':'+dateKey(selected);
+    if (renderedStaffViews.get(root) === renderKey) return;
     const start = addDays(selected,-(selected.getDay()+6)%7);
     const dates = view === 'day' ? [selected] : Array.from({length:5},(_,i)=>addDays(start,i));
     root.replaceChildren();
@@ -55,6 +59,7 @@ window.Dashboard = (() => {
       }
       row.append(heading,slots);root.append(row);
     }
+    renderedStaffViews.set(root,renderKey);
   }
   function renderBreak(config, now) {
     if(config?.version!==1 || config.demo!==true || !Array.isArray(config.breaks) || config.breaks.length>100 || !config.breaks.every(b=>b && typeof b.name==='string' && b.name.trim() && b.name.length<=60 && isDate(b.start) && isDate(b.end) && b.end>=b.start)) throw Error('Ogiltiga testlov');

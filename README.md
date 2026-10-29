@@ -18,6 +18,10 @@ Python 3.12 matchar projektets befintliga GitHub-workflow. Använd befintlig che
 - **Redigera testdata:** lägg till, ändra och ta bort kalenderposter; import/export, testplaceringar, elevkoder och uppdragsstatus. Belastningstest och återställning finns här.
 - **Storbildsläge:** befintlig femdagarsvy och automatisk sidväxling var tolfte sekund. Personalplanering visas i dashboardläget.
 
+Personalplaneringen har fyra separata tidspass per medarbetare och dag: **08–10, 10–12, 12–14 och 14–16**. Fem medarbetare ger 20 aktivitetsval i dagsvyn och 100 i vardagsveckan. Varje val hör till en viss medarbetare, ett datum och ett tidspass. På vardagar är På plats standard; i en vald helgdag är Frånvarande standard.
+
+Aktivitetsvalen är På plats, Inledande möte, Pedagogiskt möte, Uppföljningsmöte, Avslutande möte, Utskolning, Observation, Handledning, Privat, Annat och Frånvarande. Alla avser testdata.
+
 Testkalendern lagras i `resursteamet_demo_calendar_v1`. Den tidigare nyckeln `resursteamet_public_calendar_v1` läses inte automatiskt och ändras inte. `Återställ testdata` rensar endast testkalendern och laddar om sidan. Personalplanering, uppdrag, placeringar och ändrade elevkoder hålls i minnet och återställs vid omladdning. Kalenderbackup använder fortfarande `resursteamet-calendar`, version 1. Import godtar högst 1 MB och 500 poster, validerar datum/tid/ID och kräver bekräftelse. Importerade ID som redan finns läggs inte till igen.
 
 ## Data och anslutningar
